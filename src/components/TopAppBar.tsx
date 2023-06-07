@@ -38,7 +38,7 @@ const TopAppBar = () => {
   };
 
   return (
-    <AppBar color="primary">
+    <AppBar color="primary" position="sticky">
       <Toolbar className="flex justify-between">
         <Box className="sm:hidden block">
           <IconButton onClick={handleOpenNavMenu}>
@@ -63,20 +63,12 @@ const TopAppBar = () => {
           <Box className="ml-16 sm:flex hidden sm:items-center sm:gap-6">
             {pages.map((page) => (
               <Link
+                key={page}
                 className="text-white block cursor-pointer"
                 underline="none"
               >
                 {page}
               </Link>
-              // <Button
-              //   variant="text"
-              //   key={page}
-              //   size="small"
-              //   onClick={handleCloseNavMenu}
-              //   className="text-white "
-              // >
-              //   {page}
-              // </Button>
             ))}
           </Box>
         </Box>
