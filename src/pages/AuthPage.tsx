@@ -96,7 +96,7 @@ const AuthPage = () => {
                 setLogIn((val) => !val);
               }}
             >
-              {isLoginIn ? "Log In" : "Sign Up"}
+              {!isLoginIn ? "Log In" : "Sign Up"}
             </Link>{" "}
             Instead
           </Typography>
