@@ -10,17 +10,19 @@ import {
 } from "@mui/material";
 
 import AuthPage from "./pages/AuthPage";
+import HomePage from "./pages/HomePage";
 
 function App() {
   const theme = createTheme({
     palette: { mode: "dark", primary: { main: "#E50914" } },
+    typography: { fontFamily: "Lato, sans-serif" },
   });
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline>
         <StyledEngineProvider injectFirst>
-          <AuthPage></AuthPage>
+          <HomePage></HomePage>
         </StyledEngineProvider>
       </CssBaseline>
     </ThemeProvider>

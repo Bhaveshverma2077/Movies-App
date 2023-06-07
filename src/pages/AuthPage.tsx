@@ -61,7 +61,7 @@ const AuthPage = () => {
             Sign In
           </Button>
         </Box>
-        <Box className="flex justify-end py-2 ">
+        <Box className="flex justify-end py-2">
           <Link component="button" variant="body2" onClick={() => {}}>
             Forgot Password?
           </Link>
