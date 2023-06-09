@@ -4,10 +4,12 @@
   "author": "bhaveshverma2077",
   "license": "ISC",
   "scripts": {
-    "install": "npm run install-client",
+    "install-packages": "npm run install-client; npm run install-server",
     "install-client": "npm install --prefix client",
-    "start": "npm run start-client",
-    "start-client": "npm start --prefix client"
+    "install-server": "npm install --prefix client",
+    "start": "concurrently --kill-others \"npm run start-client\" \"npm run start-server\"",
+    "start-client": "npm start --prefix client",
+    "start-server": "npm start --prefix server"
   },
   "repository": {
     "type": "git",
@@ -16,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/Bhaveshverma2077/Movies-App/issues"
   },
-  "homepage": "https://github.com/Bhaveshverma2077/Movies-App#readme"
+  "homepage": "https://github.com/Bhaveshverma2077/Movies-App#readme",
+  "devDependencies": {
+    "concurrently": "^8.1.0"
+  }
 }

@@ -2,10 +2,10 @@ import express from "express";
 import movieRouter from "./routes/movies";
 import dotenv from "dotenv";
 
-const PORT = process.env.PORT || 3000;
-
 dotenv.config();
 const app = express();
+
+const PORT = process.env.PORT || 3000;
 
 app.use(movieRouter);
 
