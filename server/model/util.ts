@@ -41,6 +41,7 @@ class ApiTvShowData {
     this.results = results;
   }
 }
+
 type ApiMovieById = {
   adult: boolean;
   backdrop_path: string;
@@ -64,4 +65,29 @@ type ApiMovieById = {
   vote_count: number;
 };
 
-export { ApiMovieData, ApiTvShowData, ApiMovieById };
+type ApiTvShowById = {
+  adult: boolean;
+  backdrop_path: string;
+  in_production: string;
+  genres: Array<{ id: number; name: "string" }>;
+  homepage: string;
+  id: number;
+  overview: string;
+  poster_path: string;
+  first_air_date: string;
+  last_air_date: string;
+  number_of_episodes: number;
+  status: string;
+  seasons: Array<{
+    season_number: number;
+    episode_count: number;
+    id: number;
+    name: string;
+    poster_path: string;
+  }>;
+  name: string;
+  vote_average: number;
+  vote_count: number;
+};
+
+export { ApiMovieData, ApiTvShowData, ApiMovieById, ApiTvShowById };

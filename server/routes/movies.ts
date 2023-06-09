@@ -1,12 +1,33 @@
 import { Router } from "express";
 import moviesController from "../controller/movies";
+import tvShowsController from "../controller/tvshows";
 
 const router = Router();
 
+//Movies
 router.route("/discover/movies").get(moviesController.getMovies);
 
-router.route("/discover/tv-shows").get(moviesController.getTvShows);
+router.route("/find/movie/:id").get(moviesController.getMovieById);
 
-router.route("/find/:id").get(moviesController.getById);
+router
+  .route("/search/movie/:searchString")
+  .get(moviesController.getSearchMovie);
+
+router
+  .route("/recommendations/movies/:id")
+  .get(moviesController.getMovieRecommendationsById);
+
+//TvShows
+router.route("/discover/tv-shows").get(tvShowsController.getTvShows);
+
+router.route("/find/tvshow/:id").get(tvShowsController.getTvShowById);
+
+router
+  .route("/search/tvshow/:searchString")
+  .get(tvShowsController.getSearchTvShow);
+
+router
+  .route("/recommendations/tvshows/:id")
+  .get(tvShowsController.getTvShowsRecommendationsById);
 
 export default router;
