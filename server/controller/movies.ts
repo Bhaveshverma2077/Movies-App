@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { ApiMovieById, ApiMovieData } from "../model/util";
 
+// Helpers
+
 const genresList = [
   {
     id: 28,
@@ -80,13 +82,14 @@ const genresList = [
   },
 ];
 
-const moviesHelper = (params?: {}) => {
+const moviesHelper = (route: string, params?: {}) => {
   let genreParams = "";
+
   if (params) {
     genreParams = "?" + new URLSearchParams(params).toString();
   }
 
-  return fetch(`https://api.themoviedb.org/3/discover/movie${genreParams}`, {
+  return fetch(`${route}${genreParams}`, {
     headers: {
       Authorization: `Bearer ${process.env.API_KEY}`,
     },
@@ -115,8 +118,10 @@ const moviesHelper = (params?: {}) => {
     });
 };
 
+// Controllers
+
 const getMovies = (req: Request, res: Response, next: NextFunction) => {
-  moviesHelper()
+  moviesHelper("https://api.themoviedb.org/3/discover/movie")
     .then((data) => {
       res.status(200).json(data);
     })
@@ -143,7 +148,51 @@ const getMoviesWithGenre = (
     return;
   }
 
-  moviesHelper(genreParams)
+  moviesHelper("https://api.themoviedb.org/3/discover/movie", genreParams)
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.status(400).json({ err: "something went wrong" });
+    });
+};
+
+const getTopRated = (req: Request, res: Response, next: NextFunction) => {
+  moviesHelper("https://api.themoviedb.org/3/movie/top_rated")
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.status(400).json({ err: "something went wrong" });
+    });
+};
+
+const getPopular = (req: Request, res: Response, next: NextFunction) => {
+  moviesHelper("https://api.themoviedb.org/3/movie/popular")
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.status(400).json({ err: "something went wrong" });
+    });
+};
+
+const getUpcoming = (req: Request, res: Response, next: NextFunction) => {
+  moviesHelper("https://api.themoviedb.org/3/movie/upcoming")
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.status(400).json({ err: "something went wrong" });
+    });
+};
+
+const getMoviesInTheatres = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  moviesHelper("https://api.themoviedb.org/3/movie/now_playing")
     .then((data) => {
       res.status(200).json(data);
     })
@@ -226,38 +275,26 @@ const getMovieById = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
+const getSimilarById = (req: Request, res: Response, next: NextFunction) => {
+  moviesHelper(`https://api.themoviedb.org/3/movie/${req.params.id}/similar`)
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.status(400).json({ err: "something went wrong" });
+    });
+};
+
 const getMovieRecommendationsById = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  fetch(`https://api.themoviedb.org/3/movie/${req.params.id}/recommendations`, {
-    headers: {
-      Authorization: `Bearer ${process.env.API_KEY}`,
-    },
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("something went wrong");
-      }
-      return response.json();
-    })
-    .then((body: ApiMovieData) => {
-      const data = body.results;
-      const outgoingData = data.map((item) => ({
-        adult: item.adult,
-        genreIds: item.genre_ids,
-        id: item.id,
-        title: item.title,
-        posterPath: item.poster_path,
-        backdropPath: item.backdrop_path,
-        overview: item.overview,
-        releaseDate: item.release_date,
-        rating: item.vote_average,
-        ratingCount: item.vote_count,
-      }));
-
-      res.status(200).send(outgoingData);
+  moviesHelper(
+    `https://api.themoviedb.org/3/movie/${req.params.id}/recommendations`
+  )
+    .then((data) => {
+      res.status(200).json(data);
     })
     .catch((err) => {
       res.status(400).json({ err: "something went wrong" });
@@ -266,8 +303,13 @@ const getMovieRecommendationsById = (
 
 export default {
   getMovies,
+  getPopular,
+  getTopRated,
+  getMoviesInTheatres,
+  getUpcoming,
   getMovieById,
   getSearchMovie,
   getMoviesWithGenre,
+  getSimilarById,
   getMovieRecommendationsById,
 };
