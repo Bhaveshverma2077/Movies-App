@@ -1,13 +1,92 @@
 import { Request, Response, NextFunction } from "express";
-import {
-  ApiMovieById,
-  ApiMovieData,
-  ApiTvShowById,
-  ApiTvShowData,
-} from "../model/util";
+import { ApiMovieById, ApiMovieData } from "../model/util";
 
-const getMovies = (req: Request, res: Response, next: NextFunction) => {
-  fetch("https://api.themoviedb.org/3/discover/movie", {
+const genresList = [
+  {
+    id: 28,
+    name: "Action",
+  },
+  {
+    id: 12,
+    name: "Adventure",
+  },
+  {
+    id: 16,
+    name: "Animation",
+  },
+  {
+    id: 35,
+    name: "Comedy",
+  },
+  {
+    id: 80,
+    name: "Crime",
+  },
+  {
+    id: 99,
+    name: "Documentary",
+  },
+  {
+    id: 18,
+    name: "Drama",
+  },
+  {
+    id: 10751,
+    name: "Family",
+  },
+  {
+    id: 14,
+    name: "Fantasy",
+  },
+  {
+    id: 36,
+    name: "History",
+  },
+  {
+    id: 27,
+    name: "Horror",
+  },
+  {
+    id: 10402,
+    name: "Music",
+  },
+  {
+    id: 9648,
+    name: "Mystery",
+  },
+  {
+    id: 10749,
+    name: "Romance",
+  },
+  {
+    id: 878,
+    name: "Science Fiction",
+  },
+  {
+    id: 10770,
+    name: "TV Movie",
+  },
+  {
+    id: 53,
+    name: "Thriller",
+  },
+  {
+    id: 10752,
+    name: "War",
+  },
+  {
+    id: 37,
+    name: "Western",
+  },
+];
+
+const moviesHelper = (params?: {}) => {
+  let genreParams = "";
+  if (params) {
+    genreParams = "?" + new URLSearchParams(params).toString();
+  }
+
+  return fetch(`https://api.themoviedb.org/3/discover/movie${genreParams}`, {
     headers: {
       Authorization: `Bearer ${process.env.API_KEY}`,
     },
@@ -32,8 +111,41 @@ const getMovies = (req: Request, res: Response, next: NextFunction) => {
         rating: item.vote_average,
         ratingCount: item.vote_count,
       }));
+      return outgoingData;
+    });
+};
 
-      res.status(200).send(outgoingData);
+const getMovies = (req: Request, res: Response, next: NextFunction) => {
+  moviesHelper()
+    .then((data) => {
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      res.status(400).json({ err: "something went wrong" });
+    });
+};
+
+const getMoviesWithGenre = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  let genreParams: {} | undefined;
+
+  genresList.forEach((genre) => {
+    if (genre.name.toLowerCase() === req.params.genre.toLocaleLowerCase())
+      genreParams = { with_genres: genre.id };
+    return;
+  });
+
+  if (!genreParams) {
+    res.status(400).json({ err: "invalid genre" });
+    return;
+  }
+
+  moviesHelper(genreParams)
+    .then((data) => {
+      res.status(200).json(data);
     })
     .catch((err) => {
       res.status(400).json({ err: "something went wrong" });
@@ -156,5 +268,6 @@ export default {
   getMovies,
   getMovieById,
   getSearchMovie,
+  getMoviesWithGenre,
   getMovieRecommendationsById,
 };

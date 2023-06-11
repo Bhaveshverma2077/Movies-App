@@ -20,6 +20,12 @@ router
 //TvShows
 router.route("/discover/tv-shows").get(tvShowsController.getTvShows);
 
+router
+  .route("/genres/tv-shows/:genre")
+  .get(tvShowsController.getTvShowsWithGenres);
+
+router.route("/genres/movie/:genre").get(moviesController.getMoviesWithGenre);
+
 router.route("/find/tvshow/:id").get(tvShowsController.getTvShowById);
 
 router
