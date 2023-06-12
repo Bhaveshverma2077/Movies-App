@@ -11,6 +11,8 @@ import {
 
 import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
+import { Provider } from "react-redux";
+import store from "./store";
 
 function App() {
   const theme = createTheme({
@@ -22,7 +24,9 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline>
         <StyledEngineProvider injectFirst>
-          <HomePage></HomePage>
+          <Provider store={store}>
+            <HomePage></HomePage>
+          </Provider>
         </StyledEngineProvider>
       </CssBaseline>
     </ThemeProvider>

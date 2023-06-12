@@ -1,4 +1,10 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  AsyncThunk,
+  BaseThunkAPI,
+} from "@reduxjs/toolkit/dist/createAsyncThunk";
+import { type } from "os";
+import { AppDispatch, RootState } from ".";
 
 type moviesType = {
   adult: boolean;
@@ -44,7 +50,7 @@ type genresType = {
   movies: Array<moviesType>;
 }[];
 
-const moviesInitialSate: {
+type moviesInitialSateType = {
   discover: movieStateType;
   genres: genresType;
   popular: movieStateType;
@@ -52,7 +58,9 @@ const moviesInitialSate: {
   latest: movieStateType;
   upcomming: movieStateType;
   topRated: movieStateType;
-} = {
+};
+
+const moviesInitialSate: moviesInitialSateType = {
   latest: { page: 0, movies: [] },
   popular: { page: 0, movies: [] },
   discover: { page: 0, movies: [] },
@@ -62,18 +70,37 @@ const moviesInitialSate: {
   topRated: { page: 0, movies: [] },
 };
 
+const fetchPopular = createAsyncThunk<
+  Array<moviesType>,
+  undefined,
+  { state: RootState }
+>("movies/update-popular", async (_, thunkApi) => {
+  const state = thunkApi.getState();
+
+  return fetch(
+    `http://localhost:9000/movies/popular?page=${state.movies.popular.page + 1}`
+  )
+    .then((res) => res.json())
+    .then((body: Array<moviesType>) => body);
+});
+
 const moviesSlice = createSlice({
   name: "movies",
   initialState: moviesInitialSate,
-  reducers: {
-    updateLatest: (state, payload) => {
+  reducers: {},
+  extraReducers(builder) {
+    builder.addCase(fetchPopular.fulfilled, (state, action) => {
+      state.popular.page += 1;
+      state.popular.movies = [...state.popular.movies, ...action.payload];
       return state;
-    },
+    });
   },
 });
 
 const moviesActions = moviesSlice.actions;
 
-export { moviesActions };
+export type { movieStateType, moviesType };
+
+export { moviesActions, fetchPopular };
 
 export default moviesSlice;

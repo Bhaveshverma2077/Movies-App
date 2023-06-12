@@ -4,16 +4,20 @@ import { Box, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
+import { tvShowsStateType } from "../store/tv-shows-slice";
+import { movieStateType } from "../store/movies-slice";
+import ScrollableRowTile from "./ScrollableRowTile";
 import ScrollableRowSkeleton from "./ScrollableRowSkeleton";
 
-type Props = {
+interface Props {
   title: string;
-  moviesData: {};
+  moviesData?: movieStateType; // only renders movies if both movieData and tvShowsData is Provided
+  tvShowsData?: tvShowsStateType; //
   height: string | number;
   width: string | number;
-};
+}
 
-const ScrollableRow: React.FC<Props> = (props) => {
+const ScrollableRow = (props: Props) => {
   const ref = useRef<HTMLElement>(null);
 
   const handleScroll = (where: "backward" | "forward") => {
@@ -25,9 +29,9 @@ const ScrollableRow: React.FC<Props> = (props) => {
   };
 
   return (
-    <>
+    <Box>
       <Typography variant="h5" className="ml-8 sm:ml-36 mb-3">
-        Featured
+        {props.title}
       </Typography>
       <Box className="relative">
         <Box
@@ -39,8 +43,40 @@ const ScrollableRow: React.FC<Props> = (props) => {
             scrollSnapType: "x mandatory",
           }}
         >
-          <ScrollableRowSkeleton height={props.height} width={props.width} />
-          <ScrollableRowSkeleton height={props.height} width={props.width} />
+          {props.moviesData?.movies.length === 0 &&
+            [...Array(8)].map(() => (
+              <ScrollableRowSkeleton
+                height={props.height}
+                width={props.width}
+              />
+            ))}
+          {props.tvShowsData?.tvShows.length === 0 &&
+            [...Array(8)].map(() => (
+              <ScrollableRowSkeleton
+                height={props.height}
+                width={props.width}
+              />
+            ))}
+
+          {props.moviesData &&
+            props.moviesData.movies.map((data) => (
+              <ScrollableRowTile
+                key={data.id}
+                height={props.height}
+                width={props.width}
+                movie={data}
+              ></ScrollableRowTile>
+            ))}
+          {props.tvShowsData &&
+            !props.moviesData &&
+            props.tvShowsData.tvShows.map((data) => (
+              <ScrollableRowTile
+                key={data.id}
+                height={props.height}
+                width={props.width}
+                tvShow={data}
+              ></ScrollableRowTile>
+            ))}
         </Box>
         <IconButton
           className="absolute top-1/2"
@@ -57,7 +93,7 @@ const ScrollableRow: React.FC<Props> = (props) => {
           <ArrowForwardIosIcon />
         </IconButton>
       </Box>
-    </>
+    </Box>
   );
 };
 

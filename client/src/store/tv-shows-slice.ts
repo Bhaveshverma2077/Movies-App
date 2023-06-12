@@ -1,4 +1,6 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { type } from "os";
+import { RootState } from ".";
 
 type detailedtvShowsType = {
   adult: boolean;
@@ -45,7 +47,7 @@ type genresType = {
   tvShows: Array<tvShowsType>;
 }[];
 
-const tvShowsInitialSate: {
+type tvShowsInitialSateType = {
   discover: tvShowsStateType;
   genres: genresType;
   popular: tvShowsStateType;
@@ -53,7 +55,9 @@ const tvShowsInitialSate: {
   latest: tvShowsStateType;
   upcomming: tvShowsStateType;
   topRated: tvShowsStateType;
-} = {
+};
+
+const tvShowsInitialSate: tvShowsInitialSateType = {
   latest: { page: 0, tvShows: [] },
   popular: { page: 0, tvShows: [] },
   discover: { page: 0, tvShows: [] },
@@ -63,18 +67,52 @@ const tvShowsInitialSate: {
   topRated: { page: 0, tvShows: [] },
 };
 
+const fetchPopular = createAsyncThunk<
+  Array<tvShowsType>,
+  undefined,
+  { state: RootState }
+>("tvshows/update-popular", async (_, thunkApi) => {
+  return fetch("http://localhost:9000/tv-shows/popular")
+    .then((res) => res.json())
+    .then((body) => {
+      return body;
+    });
+});
+
+const fetchTopRated = createAsyncThunk<
+  Array<tvShowsType>,
+  undefined,
+  { state: RootState }
+>("tvshows/update-top-rated", async (_, thunkApi) => {
+  return fetch("http://localhost:9000/tv-shows/top-rated")
+    .then((res) => res.json())
+    .then((body) => {
+      return body;
+    });
+});
+
 const tvShowsSlice = createSlice({
   name: "tvshows",
   initialState: tvShowsInitialSate,
-  reducers: {
-    in: (state, payload) => {
+  reducers: {},
+  extraReducers(builder) {
+    builder.addCase(fetchPopular.fulfilled, (state, action) => {
+      state.popular.page += 1;
+      state.popular.tvShows = [...state.popular.tvShows, ...action.payload];
       return state;
-    },
+    });
+    builder.addCase(fetchTopRated.fulfilled, (state, action) => {
+      state.topRated.page += 1;
+      state.topRated.tvShows = [...state.topRated.tvShows, ...action.payload];
+      return state;
+    });
   },
 });
 
 const tvShowsActions = tvShowsSlice.actions;
 
-export { tvShowsActions };
+export type { tvShowsStateType, tvShowsType };
+
+export { tvShowsActions, fetchPopular };
 
 export default tvShowsSlice;
