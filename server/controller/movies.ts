@@ -82,7 +82,7 @@ const genresList = [
   },
 ];
 
-const moviesHelper = (route: string, params?: {}) => {
+const moviesHelper = (route: string, params?: {} | null) => {
   let genreParams = "";
 
   if (params) {
@@ -121,7 +121,13 @@ const moviesHelper = (route: string, params?: {}) => {
 // Controllers
 
 const getMovies = (req: Request, res: Response, next: NextFunction) => {
-  moviesHelper("https://api.themoviedb.org/3/discover/movie")
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  moviesHelper(`https://api.themoviedb.org/3/discover/movie`, params)
     .then((data) => {
       res.status(200).json(data);
     })
@@ -138,9 +144,12 @@ const getMoviesWithGenre = (
   let genreParams: {} | undefined;
 
   genresList.forEach((genre) => {
-    if (genre.name.toLowerCase() === req.params.genre.toLocaleLowerCase())
-      genreParams = { with_genres: genre.id };
-    return;
+    if (genre.name.toLowerCase() === req.params.genre.toLocaleLowerCase()) {
+      genreParams = req.query.page
+        ? { with_genres: genre.id, page: req.query.page }
+        : { with_genres: genre.id };
+      return;
+    }
   });
 
   if (!genreParams) {
@@ -158,7 +167,13 @@ const getMoviesWithGenre = (
 };
 
 const getTopRated = (req: Request, res: Response, next: NextFunction) => {
-  moviesHelper("https://api.themoviedb.org/3/movie/top_rated")
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  moviesHelper("https://api.themoviedb.org/3/movie/top_rated", params)
     .then((data) => {
       res.status(200).json(data);
     })
@@ -168,7 +183,13 @@ const getTopRated = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getPopular = (req: Request, res: Response, next: NextFunction) => {
-  moviesHelper("https://api.themoviedb.org/3/movie/popular")
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  moviesHelper("https://api.themoviedb.org/3/movie/popular", params)
     .then((data) => {
       res.status(200).json(data);
     })
@@ -178,7 +199,13 @@ const getPopular = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getUpcoming = (req: Request, res: Response, next: NextFunction) => {
-  moviesHelper("https://api.themoviedb.org/3/movie/upcoming")
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  moviesHelper("https://api.themoviedb.org/3/movie/upcoming", params)
     .then((data) => {
       res.status(200).json(data);
     })
@@ -192,7 +219,13 @@ const getMoviesInTheatres = (
   res: Response,
   next: NextFunction
 ) => {
-  moviesHelper("https://api.themoviedb.org/3/movie/now_playing")
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  moviesHelper("https://api.themoviedb.org/3/movie/now_playing", params)
     .then((data) => {
       res.status(200).json(data);
     })
@@ -202,14 +235,15 @@ const getMoviesInTheatres = (
 };
 
 const getSearchMovie = (req: Request, res: Response, next: NextFunction) => {
-  fetch(
-    `https://api.themoviedb.org/3/search/movie?query=${req.params.searchString}`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.API_KEY}`,
-      },
-    }
-  )
+  let params = `?query=${req.params.searchString}`;
+  if (req.query.page) {
+    params = `?query=${req.params.searchString}:page=${req.query.page};`;
+  }
+  fetch(`https://api.themoviedb.org/3/search/movie${params}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.API_KEY}`,
+    },
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error("something went wrong");
@@ -276,7 +310,16 @@ const getMovieById = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getSimilarById = (req: Request, res: Response, next: NextFunction) => {
-  moviesHelper(`https://api.themoviedb.org/3/movie/${req.params.id}/similar`)
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  moviesHelper(
+    `https://api.themoviedb.org/3/movie/${req.params.id}/similar`,
+    params
+  )
     .then((data) => {
       res.status(200).json(data);
     })
@@ -290,8 +333,15 @@ const getMovieRecommendationsById = (
   res: Response,
   next: NextFunction
 ) => {
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
   moviesHelper(
-    `https://api.themoviedb.org/3/movie/${req.params.id}/recommendations`
+    `https://api.themoviedb.org/3/movie/${req.params.id}/recommendations`,
+    params
   )
     .then((data) => {
       res.status(200).json(data);

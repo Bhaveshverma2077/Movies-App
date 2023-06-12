@@ -70,7 +70,7 @@ const genresList = [
   },
 ];
 
-const tvShowsHelper = (route: string, params?: {}) => {
+const tvShowsHelper = (route: string, params?: {} | null) => {
   let genreParams = "";
   if (params) {
     genreParams = "?" + new URLSearchParams(params).toString();
@@ -108,7 +108,13 @@ const tvShowsHelper = (route: string, params?: {}) => {
 // Controllers
 
 const getTvShows = (req: Request, res: Response, next: NextFunction) => {
-  tvShowsHelper("https://api.themoviedb.org/3/discover/tv")
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  tvShowsHelper("https://api.themoviedb.org/3/discover/tv", params)
     .then((data) => {
       res.status(200).json(data);
     })
@@ -118,7 +124,13 @@ const getTvShows = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getPopular = (req: Request, res: Response, next: NextFunction) => {
-  tvShowsHelper("https://api.themoviedb.org/3/tv/popular")
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  tvShowsHelper("https://api.themoviedb.org/3/tv/popular", params)
     .then((data) => {
       res.status(200).json(data);
     })
@@ -128,7 +140,13 @@ const getPopular = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getTopRated = (req: Request, res: Response, next: NextFunction) => {
-  tvShowsHelper("https://api.themoviedb.org/3/tv/top_rated")
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  tvShowsHelper("https://api.themoviedb.org/3/tv/top_rated", params)
     .then((data) => {
       res.status(200).json(data);
     })
@@ -142,7 +160,13 @@ const getTvShowsAiringToday = (
   res: Response,
   next: NextFunction
 ) => {
-  tvShowsHelper("https://api.themoviedb.org/3/tv/airing_today")
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  tvShowsHelper("https://api.themoviedb.org/3/tv/airing_today", params)
     .then((data) => {
       res.status(200).json(data);
     })
@@ -156,7 +180,13 @@ const getTvShowsOnTheAir = (
   res: Response,
   next: NextFunction
 ) => {
-  tvShowsHelper("https://api.themoviedb.org/3/tv/on_the_air")
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  tvShowsHelper("https://api.themoviedb.org/3/tv/on_the_air", params)
     .then((data) => {
       res.status(200).json(data);
     })
@@ -204,14 +234,15 @@ const getTvShowById = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getSearchTvShow = (req: Request, res: Response, next: NextFunction) => {
-  fetch(
-    `https://api.themoviedb.org/3/search/tv?query=${req.params.searchString}`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.API_KEY}`,
-      },
-    }
-  )
+  let params = `?query=${req.params.searchString}`;
+  if (req.query.page) {
+    params = `?query=${req.params.searchString}:page=${req.query.page};`;
+  }
+  fetch(`https://api.themoviedb.org/3/search/tv${params}`, {
+    headers: {
+      Authorization: `Bearer ${process.env.API_KEY}`,
+    },
+  })
     .then((response) => {
       if (!response.ok) {
         throw new Error("something went wrong");
@@ -248,7 +279,9 @@ const getTvShowsWithGenres = (
 
   genresList.forEach((genre) => {
     if (genre.name.toLowerCase() === req.params.genre.toLocaleLowerCase())
-      genreParams = { with_genres: genre.id };
+      genreParams = req.query.page
+        ? { with_genres: genre.id, page: req.query.page }
+        : { with_genres: genre.id };
     return;
   });
 
@@ -267,7 +300,16 @@ const getTvShowsWithGenres = (
 };
 
 const getSimilarById = (req: Request, res: Response, next: NextFunction) => {
-  tvShowsHelper(`https://api.themoviedb.org/3/tv/${req.params.id}/similar`)
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
+  tvShowsHelper(
+    `https://api.themoviedb.org/3/tv/${req.params.id}/similar`,
+    params
+  )
     .then((data) => {
       res.status(200).json(data);
     })
@@ -281,8 +323,15 @@ const getTvShowsRecommendationsById = (
   res: Response,
   next: NextFunction
 ) => {
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+    };
+  }
   tvShowsHelper(
-    `https://api.themoviedb.org/3/tv/${req.params.id}/recommendations`
+    `https://api.themoviedb.org/3/tv/${req.params.id}/recommendations`,
+    params
   )
     .then((data) => {
       res.status(200).json(data);
