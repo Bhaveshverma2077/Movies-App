@@ -1,11 +1,14 @@
-import { Box } from "@mui/material";
-import ScrollableRow from "../components/ScrollableRow";
-import TopAppBar from "../components/TopAppBar";
-import { useSelector } from "react-redux";
-import store, { RootState } from "../store";
 import { useEffect } from "react";
-import { fetchPopular as fetchPopularTvShows } from "../store/tv-shows-slice";
+
+import { Box } from "@mui/material";
+import { useSelector } from "react-redux";
+
+import store, { RootState } from "../store";
+import Hero from "../components/Hero";
+import TopAppBar from "../components/TopAppBar";
+import ScrollableRow from "../components/ScrollableRow";
 import { fetchPopular as fetchPopularMovies } from "../store/movies-slice";
+import { fetchPopular as fetchPopularTvShows } from "../store/tv-shows-slice";
 
 const HomePage: React.FC = () => {
   useEffect(() => {
@@ -21,21 +24,24 @@ const HomePage: React.FC = () => {
   );
 
   return (
-    <Box className="flex flex-col gap-12">
+    <>
       <TopAppBar />
-      <ScrollableRow
-        title="Featured Movies"
-        moviesData={popularMoviesState}
-        height={"21rem"}
-        width={"14rem"}
-      />
-      <ScrollableRow
-        title="Featured Tv Shows"
-        tvShowsData={popularTvShowsState}
-        height={"21rem"}
-        width={"14rem"}
-      />
-    </Box>
+      <Box className="flex flex-col gap-12">
+        <Hero></Hero>
+        <ScrollableRow
+          title="Featured Movies"
+          moviesData={popularMoviesState}
+          height={"21rem"}
+          width={"14rem"}
+        />
+        <ScrollableRow
+          title="Featured Tv Shows"
+          tvShowsData={popularTvShowsState}
+          height={"21rem"}
+          width={"14rem"}
+        />
+      </Box>
+    </>
   );
 };
 
