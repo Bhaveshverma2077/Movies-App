@@ -31,14 +31,14 @@ const HomePage: React.FC = () => {
         <ScrollableRow
           title="Featured Movies"
           moviesData={popularMoviesState}
-          height={"21rem"}
-          width={"14rem"}
+          height={"18rem"}
+          width={"12rem"}
         />
         <ScrollableRow
           title="Featured Tv Shows"
           tvShowsData={popularTvShowsState}
-          height={"21rem"}
-          width={"14rem"}
+          height={"18rem"}
+          width={"12rem"}
         />
       </Box>
     </>
