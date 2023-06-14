@@ -17,7 +17,10 @@ import store from "./store";
 function App() {
   const theme = createTheme({
     palette: { mode: "dark", primary: { main: "#E50914" } },
-    typography: { fontFamily: "Lato, sans-serif" },
+    typography: {
+      fontFamily: "Lato, sans-serif",
+      fontWeightBold: 700,
+    },
     breakpoints: {
       values: {
         xs: 0,

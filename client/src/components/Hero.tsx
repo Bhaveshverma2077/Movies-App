@@ -22,7 +22,7 @@ const Hero: React.FC = () => {
             <img
               className="w-full"
               src="https://image.tmdb.org/t/p/original/x3uBgefbFC8blsE4Sbdi0m2a71d.png"
-              alt=""
+              alt="The Witcher logo"
             />
           </Box>
           <Box className="max-w-[24rem] ">

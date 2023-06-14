@@ -44,15 +44,17 @@ const ScrollableRow = (props: Props) => {
           }}
         >
           {props.moviesData?.movies.length === 0 &&
-            [...Array(8)].map(() => (
+            [...Array(8)].map((_, i) => (
               <ScrollableRowSkeleton
+                key={i}
                 height={props.height}
                 width={props.width}
               />
             ))}
           {props.tvShowsData?.tvShows.length === 0 &&
-            [...Array(8)].map(() => (
+            [...Array(8)].map((_, i) => (
               <ScrollableRowSkeleton
+                key={i}
                 height={props.height}
                 width={props.width}
               />
