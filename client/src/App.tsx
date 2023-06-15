@@ -13,6 +13,7 @@ import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
 import { Provider } from "react-redux";
 import store from "./store";
+import GenrePage from "./pages/GenrePage";
 
 function App() {
   const theme = createTheme({
@@ -37,7 +38,7 @@ function App() {
       <CssBaseline>
         <StyledEngineProvider injectFirst>
           <Provider store={store}>
-            <HomePage></HomePage>
+            <GenrePage></GenrePage>
           </Provider>
         </StyledEngineProvider>
       </CssBaseline>

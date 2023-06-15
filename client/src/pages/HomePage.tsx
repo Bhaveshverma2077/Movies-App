@@ -8,6 +8,7 @@ import Hero from "../components/Hero";
 import TopAppBar from "../components/TopAppBar";
 import ScrollableRow from "../components/ScrollableRow";
 import { fetchPopular as fetchPopularMovies } from "../store/movies-slice";
+
 import { fetchPopular as fetchPopularTvShows } from "../store/tv-shows-slice";
 
 const HomePage: React.FC = () => {
