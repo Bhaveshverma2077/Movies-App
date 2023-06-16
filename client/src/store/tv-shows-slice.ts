@@ -2,6 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { type } from "os";
 import { RootState } from ".";
 
+const apiUrl = "192.168.1.7:9000";
+
 type detailedtvShowsType = {
   adult: boolean;
   backdropPath: string;
@@ -72,7 +74,7 @@ const fetchPopular = createAsyncThunk<
   undefined,
   { state: RootState }
 >("tvshows/update-popular", async (_, thunkApi) => {
-  return fetch("http://localhost:9000/tv-shows/popular")
+  return fetch(`http://${apiUrl}/tv-shows/popular`)
     .then((res) => res.json())
     .then((body) => {
       return body;
@@ -84,7 +86,7 @@ const fetchTopRated = createAsyncThunk<
   undefined,
   { state: RootState }
 >("tvshows/update-top-rated", async (_, thunkApi) => {
-  return fetch("http://localhost:9000/tv-shows/top-rated")
+  return fetch(`http://${apiUrl}/tv-shows/top-rated`)
     .then((res) => res.json())
     .then((body) => {
       return body;

@@ -30,12 +30,14 @@ const HomePage: React.FC = () => {
       <Box className="flex flex-col gap-12">
         <Hero></Hero>
         <ScrollableRow
+          posterOrBackdrop="POSTER"
           title="Featured Movies"
           moviesData={popularMoviesState}
           height={"18rem"}
           width={"12rem"}
         />
         <ScrollableRow
+          posterOrBackdrop="POSTER"
           title="Featured Tv Shows"
           tvShowsData={popularTvShowsState}
           height={"18rem"}

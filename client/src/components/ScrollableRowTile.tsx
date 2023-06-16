@@ -12,6 +12,7 @@ type Props = {
   width: number | string;
   movie?: moviesType;
   tvShow?: tvShowsType;
+  posterOrBackdrop: "POSTER" | "BACKDROP";
 };
 
 const ScrollableRowTile: React.FC<Props> = (props) => {
@@ -21,15 +22,24 @@ const ScrollableRowTile: React.FC<Props> = (props) => {
   if (props.movie) {
     movieOrTvData.id = props.movie?.id;
     movieOrTvData.name = props.movie?.title;
-    movieOrTvData.path = props.movie?.posterPath;
+
+    movieOrTvData.path =
+      props.posterOrBackdrop === "POSTER"
+        ? props.movie?.posterPath
+        : props.movie.backdropPath;
   }
   if (props.tvShow) {
     movieOrTvData.id = props.tvShow?.id;
     movieOrTvData.name = props.tvShow?.name;
     movieOrTvData.path = props.tvShow?.posterPath;
+    movieOrTvData.path =
+      props.posterOrBackdrop === "POSTER"
+        ? props.tvShow?.posterPath
+        : props.tvShow.backdropPath;
   }
 
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [isHover, setIsHover] = useState(false);
 
   return (
@@ -51,17 +61,34 @@ const ScrollableRowTile: React.FC<Props> = (props) => {
         height: props.height,
       }}
     >
-      {isLoading && (
+      {isLoading && !error && (
         <ScrollableRowSkeleton height={props.height} width={props.width} />
       )}
-      <img
-        className={`scale-50 w-full ${isLoading ? "hidden" : ""}`}
-        src={`https://image.tmdb.org/t/p/w500${movieOrTvData.path}`}
-        alt={movieOrTvData.name}
-        onLoad={() => {
-          setIsLoading(false);
-        }}
-      />
+
+      {!error && (
+        <img
+          className={`scale-50 w-full ${isLoading ? "hidden" : ""}`}
+          src={`https://image.tmdb.org/t/p/w500${movieOrTvData.path}`}
+          alt={movieOrTvData.name}
+          onLoad={() => {
+            setIsLoading(false);
+          }}
+          onError={() => {
+            setIsLoading(false);
+            setError(true);
+          }}
+        />
+      )}
+      {error && (
+        <Box
+          className={`w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-200`}
+        >
+          <Typography className="my-auto" variant="subtitle1">
+            Preview Not Available
+          </Typography>
+        </Box>
+      )}
+
       <Box
         className={`bg-red-700  ${
           isHover ? "visible opacity-70" : "invisible opacity-0"

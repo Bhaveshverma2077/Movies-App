@@ -13,6 +13,7 @@ interface Props {
   title: string;
   moviesData?: movieStateType; // only renders movies if both movieData and tvShowsData is Provided
   tvShowsData?: tvShowsStateType; //
+  posterOrBackdrop: "POSTER" | "BACKDROP";
   height: string | number;
   width: string | number;
 }
@@ -30,7 +31,7 @@ const ScrollableRow = (props: Props) => {
 
   return (
     <Box>
-      <Typography variant="h5" className="ml-8 sm:ml-36 mb-3">
+      <Typography variant="h5" className="ml-8 md:ml-[8rem] mb-3">
         {props.title}
       </Typography>
       <Box className="relative">
@@ -63,6 +64,7 @@ const ScrollableRow = (props: Props) => {
           {props.moviesData &&
             props.moviesData.movies.map((data) => (
               <ScrollableRowTile
+                posterOrBackdrop={props.posterOrBackdrop}
                 key={data.id}
                 height={props.height}
                 width={props.width}
@@ -73,6 +75,7 @@ const ScrollableRow = (props: Props) => {
             !props.moviesData &&
             props.tvShowsData.tvShows.map((data) => (
               <ScrollableRowTile
+                posterOrBackdrop={props.posterOrBackdrop}
                 key={data.id}
                 height={props.height}
                 width={props.width}

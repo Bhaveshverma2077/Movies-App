@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { ApiMovieById, ApiMovieData } from "../model/util";
+import {
+  ApiMovieById,
+  ApiMovieData,
+  ApiWatchProviderData,
+} from "../model/util";
 
 // Helpers
 
@@ -273,35 +277,58 @@ const getSearchMovie = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const getMovieById = (req: Request, res: Response, next: NextFunction) => {
-  fetch(`https://api.themoviedb.org/3/movie/${req.params.id}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.API_KEY}`,
-    },
-  })
-    .then((response) => {
+  Promise.all([
+    fetch(`https://api.themoviedb.org/3/movie/${req.params.id}`, {
+      headers: {
+        Authorization: `Bearer ${process.env.API_KEY}`,
+      },
+    }).then((response) => {
       if (!response.ok) {
         throw new Error("something went wrong");
       }
       return response.json();
-    })
-    .then((body: ApiMovieById) => {
+    }),
+    fetch(
+      `https://api.themoviedb.org/3/movie/${req.params.id}/watch/providers`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.API_KEY}`,
+        },
+      }
+    ).then((res) => res.json()),
+  ])
+    .then((body: [ApiMovieById, ApiWatchProviderData]) => {
+      if (!body[1].results["IN"].buy) {
+        body[1].results["IN"].buy = [];
+      }
+      if (!body[1].results["IN"].flatrate) {
+        body[1].results["IN"].flatrate = [];
+      }
+      const allProviders = [...body[1].results["IN"]?.flatrate];
+      const moviesWatchProvider = allProviders.map((provider) => ({
+        logoPath: provider.logo_path,
+        providerName: provider.provider_name,
+      }));
       const outgoingData = {
-        adult: body.adult,
-        backdropPath: body.backdrop_path,
-        belongsToCollection: body.belongs_to_collection,
-        genres: body.genres,
-        homepage: body.homepage,
-        id: body.id,
-        imdbId: body.imdb_id,
-        overview: body.overview,
-        posterPath: body.poster_path,
-        releaseDate: body.release_date,
-        runtime: body.runtime,
-        status: body.status,
-        title: body.title,
-        rating: body.vote_average,
-        ratingCount: body.vote_count,
+        adult: body[0].adult,
+        backdropPath: body[0].backdrop_path,
+        belongsToCollection: body[0].belongs_to_collection,
+        genres: body[0].genres,
+        moviesWatchProvider: moviesWatchProvider,
+        homepage: body[0].homepage,
+        id: body[0].id,
+        imdbId: body[0].imdb_id,
+        overview: body[0].overview,
+        posterPath: body[0].poster_path,
+        releaseDate: body[0].release_date,
+        runtime: body[0].runtime,
+        status: body[0].status,
+        title: body[0].title,
+        rating: body[0].vote_average,
+        ratingCount: body[0].vote_count,
       };
+      console.log(outgoingData);
+
       res.status(200).send(outgoingData);
     })
     .catch((err) => {

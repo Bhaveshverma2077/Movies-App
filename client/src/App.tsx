@@ -14,6 +14,7 @@ import HomePage from "./pages/HomePage";
 import { Provider } from "react-redux";
 import store from "./store";
 import GenrePage from "./pages/GenrePage";
+import MovieOrTvShowDetailPage from "./pages/MovieOrTvShowDetailPage";
 
 function App() {
   const theme = createTheme({
@@ -38,7 +39,7 @@ function App() {
       <CssBaseline>
         <StyledEngineProvider injectFirst>
           <Provider store={store}>
-            <GenrePage></GenrePage>
+            <MovieOrTvShowDetailPage />
           </Provider>
         </StyledEngineProvider>
       </CssBaseline>

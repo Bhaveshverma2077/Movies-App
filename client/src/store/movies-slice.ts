@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import { RootState } from ".";
+import store, { RootState } from ".";
 
 type genreType = { id: number; name: string };
+
+const apiUrl = "192.168.1.7:9000";
 
 const genresList = [
   {
@@ -85,7 +87,7 @@ const genresList = [
 
 type moviesType = {
   adult: boolean;
-  genreIds: Array<number>;
+  genreIds: Array<{ id: number; name: string }>;
   id: number;
   title: string;
   posterPath: string;
@@ -99,6 +101,8 @@ type moviesType = {
 type detailedMoviesType = {
   adult: boolean;
   backdropPath: string;
+  recommendations: Array<moviesType> | undefined;
+  similar: Array<moviesType> | undefined;
   belongsToCollection: {
     id: number;
     name: string;
@@ -106,6 +110,10 @@ type detailedMoviesType = {
     backdrop_path: string;
   };
   genres: Array<{ id: number; name: "string" }>;
+  moviesWatchProvider: Array<{
+    logoPath: string;
+    providerName: string;
+  }>;
   homepage: string;
   id: number;
   imdbId: string;
@@ -157,10 +165,54 @@ const fetchPopular = createAsyncThunk<
   const state = thunkApi.getState();
 
   return fetch(
-    `http://localhost:9000/movies/popular?page=${state.movies.popular.page + 1}`
+    `http://${apiUrl}/movies/popular?page=${state.movies.popular.page + 1}`
   )
     .then((res) => res.json())
     .then((body: Array<moviesType>) => body);
+});
+
+const fetchRecommendedAndSimilar = createAsyncThunk<
+  {
+    movieId: number;
+    recommendations: Array<moviesType>;
+    similar: Array<moviesType>;
+  },
+  number,
+  { state: RootState }
+>("movies/update-recommendations-and-similar", async (id, thunkApi) => {
+  const state = thunkApi.getState();
+
+  return Promise.all([
+    fetch(
+      `http://${apiUrl}/movies/recommendations/${id}?page=${
+        state.movies.popular.page + 1
+      }`
+    ).then((res) => res.json()),
+    fetch(
+      `http://${apiUrl}/movies/similar/${id}?page=${
+        state.movies.popular.page + 1
+      }`
+    ).then((res) => res.json()),
+  ]).then((body: [Array<moviesType>, Array<moviesType>]) => ({
+    movieId: id,
+    recommendations: body[0],
+    similar: body[1],
+  }));
+});
+
+const fetchMovieDetail = createAsyncThunk<
+  detailedMoviesType,
+  number,
+  { state: RootState }
+>("movies/update-movie-watchProvider", async (id, thunkApi) => {
+  const state = thunkApi.getState();
+
+  return fetch(`http://${apiUrl}/movies/find/${id}`)
+    .then((res) => {
+      store.dispatch(fetchRecommendedAndSimilar(id));
+      return res.json();
+    })
+    .then((body: detailedMoviesType) => body);
 });
 
 const fetchGenre = createAsyncThunk<
@@ -177,7 +229,7 @@ const fetchGenre = createAsyncThunk<
   > = [];
   genresList.map((genre) => {
     genrePromiseList.push(
-      fetch(`http://localhost:9000/movies/genres/${genre.name}`)
+      fetch(`http://${apiUrl}/movies/genres/${genre.name}`)
         .then((res) => res.json())
         .then((body: Array<moviesType>) => {
           console.log(body);
@@ -232,13 +284,33 @@ const moviesSlice = createSlice({
       state.genrePageMovies = action.payload;
       return state;
     });
+    builder.addCase(fetchMovieDetail.fulfilled, (state, action) => {
+      state.detailMovies.push(action.payload);
+
+      return state;
+    });
+    builder.addCase(fetchRecommendedAndSimilar.fulfilled, (state, action) => {
+      const movie = state.detailMovies.find(
+        (movie) => movie.id === action.payload.movieId
+      );
+      movie!.recommendations = action.payload.recommendations;
+      movie!.similar = action.payload.similar;
+      return state;
+    });
   },
 });
 
 const moviesActions = moviesSlice.actions;
 
-export type { movieStateType, moviesType };
+export type { movieStateType, moviesType, detailedMoviesType };
 
-export { moviesActions, fetchPopular, fetchGenre };
+export {
+  genresList,
+  moviesActions,
+  fetchPopular,
+  fetchGenre,
+  fetchRecommendedAndSimilar,
+  fetchMovieDetail,
+};
 
 export default moviesSlice;

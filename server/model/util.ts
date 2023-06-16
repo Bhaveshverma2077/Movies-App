@@ -90,4 +90,26 @@ type ApiTvShowById = {
   vote_count: number;
 };
 
-export { ApiMovieData, ApiTvShowData, ApiMovieById, ApiTvShowById };
+type ApiWatchProviderData = {
+  id: number;
+  results: {
+    [countryCode: string]: {
+      flatrate: Array<{
+        logo_path: string;
+        provider_name: string;
+      }>;
+      buy: Array<{
+        logo_path: string;
+        provider_name: string;
+      }>;
+    };
+  };
+};
+
+export {
+  ApiMovieData,
+  ApiTvShowData,
+  ApiMovieById,
+  ApiTvShowById,
+  ApiWatchProviderData,
+};

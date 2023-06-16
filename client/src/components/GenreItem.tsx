@@ -26,7 +26,7 @@ const GenreItem: React.FC<{
       </Typography>
       <Box className="bg-zinc-800 transition-opacity">
         <img
-          className=" w-full block"
+          className="w-full block"
           src={`https://image.tmdb.org/t/p/w500${props.movie.backdropPath}`}
           alt=""
         />
