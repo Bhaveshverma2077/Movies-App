@@ -29,6 +29,26 @@ const ScrollableRow = (props: Props) => {
     ref.current?.scrollBy({ left: -800 });
   };
 
+  if (
+    props.moviesData &&
+    props.moviesData.movies &&
+    props.moviesData.movies.length == 0
+  ) {
+    return (
+      <Typography className="pl-32" variant="h6">
+        No {props.title} Available
+      </Typography>
+    );
+  }
+
+  if (props.tvShowsData && props.tvShowsData.tvShows.length == 0) {
+    return (
+      <Typography className="pl-32" variant="h6">
+        No {props.title} Available
+      </Typography>
+    );
+  }
+
   return (
     <Box>
       <Typography variant="h5" className="ml-8 md:ml-[8rem] mb-3">
@@ -60,8 +80,8 @@ const ScrollableRow = (props: Props) => {
                 width={props.width}
               />
             ))}
-
           {props.moviesData &&
+            props.moviesData.movies.length != 0 &&
             props.moviesData.movies.map((data) => (
               <ScrollableRowTile
                 posterOrBackdrop={props.posterOrBackdrop}
@@ -73,6 +93,7 @@ const ScrollableRow = (props: Props) => {
             ))}
           {props.tvShowsData &&
             !props.moviesData &&
+            props.tvShowsData.tvShows.length != 0 &&
             props.tvShowsData.tvShows.map((data) => (
               <ScrollableRowTile
                 posterOrBackdrop={props.posterOrBackdrop}

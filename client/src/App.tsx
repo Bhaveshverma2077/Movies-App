@@ -15,6 +15,8 @@ import { Provider } from "react-redux";
 import store from "./store";
 import GenrePage from "./pages/GenrePage";
 import MovieOrTvShowDetailPage from "./pages/MovieOrTvShowDetailPage";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import Layout from "./pages/Layout";
 
 function App() {
   const theme = createTheme({
@@ -34,12 +36,30 @@ function App() {
     },
   });
 
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Layout />,
+      children: [
+        { path: "", element: <HomePage /> },
+        {
+          path: "movie",
+          children: [
+            { path: "genre", element: <GenrePage /> },
+            { path: ":id", element: <MovieOrTvShowDetailPage /> },
+          ],
+        },
+        { path: "/login", element: <AuthPage /> },
+      ],
+    },
+  ]);
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline>
         <StyledEngineProvider injectFirst>
           <Provider store={store}>
-            <MovieOrTvShowDetailPage />
+            {<RouterProvider router={router} />}
           </Provider>
         </StyledEngineProvider>
       </CssBaseline>

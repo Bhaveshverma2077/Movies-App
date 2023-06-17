@@ -95,7 +95,6 @@ const GenrePage: React.FC = () => {
   }, []);
   return (
     <>
-      <TopAppBar />
       <Box className="py-0 sm:py-0 px-0 sm:px-6 lg:px-36">
         <Grid container spacing={{ xs: 0, sm: 3 }}>
           {genrePageMovies.map((genre, i) => (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
@@ -6,6 +6,7 @@ import StarIcon from "@mui/icons-material/Star";
 import { moviesType } from "../store/movies-slice";
 import { tvShowsType } from "../store/tv-shows-slice";
 import ScrollableRowSkeleton from "./ScrollableRowSkeleton";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   height: number | string;
@@ -39,14 +40,25 @@ const ScrollableRowTile: React.FC<Props> = (props) => {
   }
 
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState(true);
   const [isHover, setIsHover] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!movieOrTvData.path) {
+      setError(true);
+      setIsLoading(false);
+      return;
+    }
+    setError(false);
+  }, []);
 
   return (
     <Button
       disabled={isLoading}
       onClick={() => {
-        console.log(movieOrTvData.id);
+        navigate(`/movie/${movieOrTvData.id}`);
       }}
       onMouseOver={() => {
         setIsHover(true);
@@ -67,19 +79,16 @@ const ScrollableRowTile: React.FC<Props> = (props) => {
 
       {!error && (
         <img
-          className={`scale-50 w-full ${isLoading ? "hidden" : ""}`}
+          className={`scale-50 w-full ${isLoading && "hidden"}`}
           src={`https://image.tmdb.org/t/p/w500${movieOrTvData.path}`}
           alt={movieOrTvData.name}
           onLoad={() => {
             setIsLoading(false);
           }}
-          onError={() => {
-            setIsLoading(false);
-            setError(true);
-          }}
         />
       )}
-      {error && (
+
+      {!isLoading && error && (
         <Box
           className={`w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-200`}
         >

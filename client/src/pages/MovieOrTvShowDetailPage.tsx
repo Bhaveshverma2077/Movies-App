@@ -5,18 +5,27 @@ import {
   Link,
   Paper,
   Rating,
+  Skeleton,
   Typography,
 } from "@mui/material";
 import TopAppBar from "../components/TopAppBar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import store, { RootState } from "../store";
 import { detailedMoviesType, fetchMovieDetail } from "../store/movies-slice";
 import ScrollableRow from "../components/ScrollableRow";
 import MovieDetailTable from "../components/MovieDetailTable";
+import { useParams } from "react-router-dom";
+
+let isInitial = 0;
+let first = true;
 
 const MovieOrTvShowDetilPage: React.FC = () => {
-  const id = 603692;
+  const id = Number(useParams<{ id: string }>()["id"]);
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(true);
+
   const movieData = useSelector(
     (state: RootState) => state.movies.detailMovies
   );
@@ -25,17 +34,36 @@ const MovieOrTvShowDetilPage: React.FC = () => {
     (movie) => movie.id == id
   );
 
-  console.log(movie);
+  //***************************************** */
+  // to handle the first two movie.path undefined and then movie.path defined or undefined
+
+  useEffect(() => {
+    setIsLoading(true);
+    if (first) {
+      first = false;
+      return;
+    }
+    isInitial = 1;
+  }, [id]);
+
+  useEffect(() => {
+    if (!movie?.posterPath && isInitial >= 2) {
+      setIsLoading(false);
+    }
+  }, [movie?.id]);
+
+  isInitial += 1;
+
+  //************************************* */
 
   useEffect(() => {
     if (!movie) {
       store.dispatch(fetchMovieDetail(id));
     }
-  }, []);
+  }, [id]);
 
   return (
     <>
-      <TopAppBar />
       <Grid container>
         <Grid item xs={8}>
           <Box className="flex flex-col h-full justify-center gap-3 pl-[9.3rem] pr-6">
@@ -86,11 +114,10 @@ const MovieOrTvShowDetilPage: React.FC = () => {
             ) : (
               <Box className="flex items-center gap-3">
                 {movie?.moviesWatchProvider.map((provider) => (
-                  <Box className="w-12">
+                  <Box className="w-12" key={provider.providerName}>
                     {" "}
                     <img
                       className="w-full"
-                      key={provider.providerName}
                       src={`https://image.tmdb.org/t/p/original/Ajqyt5aNxNGjmF9uOfxArGrdf3X.jpg`}
                       alt=""
                     />
@@ -101,12 +128,43 @@ const MovieOrTvShowDetilPage: React.FC = () => {
           </Box>
         </Grid>
         <Grid item xs={4}>
-          {" "}
-          <img
-            className="w-full mb-12"
-            src={`https://image.tmdb.org/t/p/w500${movie?.posterPath}`}
-            alt=""
-          />
+          {movie?.posterPath ? (
+            <>
+              <img
+                className={`w-full mb-12 ${isLoading && "hidden"}`}
+                src={`https://image.tmdb.org/t/p/w500${movie?.posterPath}`}
+                alt=""
+                onLoad={() => {
+                  setIsLoading(false);
+                }}
+              />
+              {isLoading && (
+                <Box className="w-full mb-12" sx={{ aspectRatio: "2 / 3" }}>
+                  <Skeleton
+                    sx={{ transform: "none" }}
+                    className="w-full h-full"
+                    component={"div"}
+                  ></Skeleton>
+                </Box>
+              )}
+            </>
+          ) : !isLoading ? (
+            <Box
+              className={`w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-200`}
+            >
+              <Typography className="my-auto" variant="subtitle1">
+                Preview Not Available
+              </Typography>
+            </Box>
+          ) : (
+            <Box className="w-full mb-12" sx={{ aspectRatio: "2 / 3" }}>
+              <Skeleton
+                sx={{ transform: "none" }}
+                className="w-full h-full"
+                component={"div"}
+              ></Skeleton>
+            </Box>
+          )}
         </Grid>
         <Grid item xs={8}>
           <Box className="flex w-[100%] flex-col gap-12 p-6">

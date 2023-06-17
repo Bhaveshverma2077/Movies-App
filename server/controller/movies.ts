@@ -298,10 +298,9 @@ const getMovieById = (req: Request, res: Response, next: NextFunction) => {
     ).then((res) => res.json()),
   ])
     .then((body: [ApiMovieById, ApiWatchProviderData]) => {
-      if (!body[1].results["IN"].buy) {
-        body[1].results["IN"].buy = [];
-      }
-      if (!body[1].results["IN"].flatrate) {
+      if (!body[1]?.results["IN"]) {
+        body[1].results["IN"] = { buy: [], flatrate: [] };
+      } else if (!body[1]?.results["IN"]?.flatrate) {
         body[1].results["IN"].flatrate = [];
       }
       const allProviders = [...body[1].results["IN"]?.flatrate];
@@ -309,6 +308,7 @@ const getMovieById = (req: Request, res: Response, next: NextFunction) => {
         logoPath: provider.logo_path,
         providerName: provider.provider_name,
       }));
+
       const outgoingData = {
         adult: body[0].adult,
         backdropPath: body[0].backdrop_path,
@@ -327,7 +327,6 @@ const getMovieById = (req: Request, res: Response, next: NextFunction) => {
         rating: body[0].vote_average,
         ratingCount: body[0].vote_count,
       };
-      console.log(outgoingData);
 
       res.status(200).send(outgoingData);
     })

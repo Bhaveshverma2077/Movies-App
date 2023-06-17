@@ -3,16 +3,16 @@ import {
   Typography,
   Toolbar,
   IconButton,
-  Button,
   AppBar,
   Menu,
+  Link,
   MenuItem,
   Tooltip,
-  Link,
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
 import React, { useState } from "react";
+import { Link as LinkReactRouter } from "react-router-dom";
 
 const pages = ["Movies", "Tv Series", "Downloads"];
 const settings = ["Profile", "Account", "Logout"];
@@ -58,14 +58,18 @@ const TopAppBar = () => {
         </Box>
         <Box className="flex">
           <Typography variant="h6" fontWeight="700">
-            LOGO
+            <Link component={LinkReactRouter} underline="none" to="/">
+              LOGO
+            </Link>
           </Typography>
           <Box className="ml-16 sm:flex hidden sm:items-center sm:gap-6">
             {pages.map((page) => (
               <Link
+                component={LinkReactRouter}
                 key={page}
                 className="text-white block cursor-pointer"
                 underline="none"
+                to={""}
               >
                 {page}
               </Link>

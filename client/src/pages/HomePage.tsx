@@ -26,7 +26,6 @@ const HomePage: React.FC = () => {
 
   return (
     <>
-      <TopAppBar />
       <Box className="flex flex-col gap-12">
         <Hero></Hero>
         <ScrollableRow

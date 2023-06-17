@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import store, { RootState } from ".";
+import { log } from "console";
 
 type genreType = { id: number; name: string };
 
@@ -193,34 +194,35 @@ const fetchRecommendedAndSimilar = createAsyncThunk<
         state.movies.popular.page + 1
       }`
     ).then((res) => res.json()),
-  ]).then((body: [Array<moviesType>, Array<moviesType>]) => ({
-    movieId: id,
-    recommendations: body[0],
-    similar: body[1],
-  }));
+  ]).then((body: [Array<moviesType>, Array<moviesType>]) => {
+    return {
+      movieId: id,
+      recommendations: body[0],
+      similar: body[1],
+    };
+  });
 });
 
 const fetchMovieDetail = createAsyncThunk<
   detailedMoviesType,
   number,
   { state: RootState }
->("movies/update-movie-watchProvider", async (id, thunkApi) => {
-  const state = thunkApi.getState();
-
+>("movies/update-movie-watchProvider", async (id) => {
   return fetch(`http://${apiUrl}/movies/find/${id}`)
     .then((res) => {
-      store.dispatch(fetchRecommendedAndSimilar(id));
       return res.json();
     })
-    .then((body: detailedMoviesType) => body);
+    .then((body: detailedMoviesType) => {
+      store.dispatch(fetchRecommendedAndSimilar(id));
+      return body;
+    });
 });
 
 const fetchGenre = createAsyncThunk<
   Array<{ genre: genreType; movie: moviesType }>,
   undefined,
   { state: RootState }
->("movies/update-genre", async (_, thunkApi) => {
-  const state = thunkApi.getState();
+>("movies/update-genre", async () => {
   const genrePromiseList: Array<
     Promise<{
       genre: genreType;
@@ -286,15 +288,15 @@ const moviesSlice = createSlice({
     });
     builder.addCase(fetchMovieDetail.fulfilled, (state, action) => {
       state.detailMovies.push(action.payload);
-
       return state;
     });
     builder.addCase(fetchRecommendedAndSimilar.fulfilled, (state, action) => {
       const movie = state.detailMovies.find(
         (movie) => movie.id === action.payload.movieId
       );
-      movie!.recommendations = action.payload.recommendations;
-      movie!.similar = action.payload.similar;
+
+      movie!.recommendations = [...action.payload.recommendations];
+      movie!.similar = [...action.payload.similar];
       return state;
     });
   },
