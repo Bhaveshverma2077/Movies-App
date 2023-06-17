@@ -15,7 +15,11 @@ import { Provider } from "react-redux";
 import store from "./store";
 import GenrePage from "./pages/GenrePage";
 import MovieOrTvShowDetailPage from "./pages/MovieOrTvShowDetailPage";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  useLocation,
+} from "react-router-dom";
 import Layout from "./pages/Layout";
 
 function App() {
