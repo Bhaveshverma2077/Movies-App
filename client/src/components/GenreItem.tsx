@@ -1,12 +1,19 @@
 import { Box, Button, Typography } from "@mui/material";
 import { moviesType } from "../store/movies-slice";
+import { useNavigate } from "react-router-dom";
 
 const GenreItem: React.FC<{
   genre: { id: number; name: string };
   movie: moviesType;
 }> = (props) => {
+  const navigate = useNavigate();
   return (
     <Button
+      onClick={() => {
+        console.log(props.genre.name);
+
+        navigate(`/movie/genre/${props.genre.name.toLowerCase()}`);
+      }}
       className={`transition-transform text-zinc-200 p-0 relative w-full`}
       sx={{
         "& div": { opacity: 0.4 },

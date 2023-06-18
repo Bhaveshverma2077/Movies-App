@@ -21,6 +21,9 @@ import {
   useLocation,
 } from "react-router-dom";
 import Layout from "./pages/Layout";
+import SearchPage from "./pages/SearchPage";
+import path from "path";
+import OneGenrePage from "./pages/OneGenrePage";
 
 function App() {
   const theme = createTheme({
@@ -49,8 +52,19 @@ function App() {
         {
           path: "movie",
           children: [
-            { path: "genre", element: <GenrePage /> },
+            {
+              path: "genre",
+              children: [
+                { path: ":genreName", element: <OneGenrePage /> },
+                { path: "", element: <GenrePage /> },
+              ],
+            },
             { path: ":id", element: <MovieOrTvShowDetailPage /> },
+            {
+              path: "search",
+              element: <SearchPage />,
+              children: [{ path: ":searchString" }],
+            },
           ],
         },
         { path: "/login", element: <AuthPage /> },

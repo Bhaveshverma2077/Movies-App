@@ -130,7 +130,7 @@ type detailedMoviesType = {
 
 type movieStateType = { page: number; movies: Array<moviesType> };
 type genresType = {
-  genre: string;
+  genreName: string;
   id: number;
   page: number;
   movies: Array<moviesType>;
@@ -218,6 +218,40 @@ const fetchMovieDetail = createAsyncThunk<
     });
 });
 
+const fetchSearch = createAsyncThunk<
+  Array<moviesType>,
+  string,
+  { state: RootState }
+>("movies/update-movie-watchProvider", async (searchString) => {
+  return fetch(`http://${apiUrl}/movies/search/${searchString}`)
+    .then((res) => {
+      return res.json();
+    })
+    .then((body: Array<moviesType>) => {
+      return body;
+    });
+});
+
+const fetchGenreItems = createAsyncThunk<
+  { genre: genreType; data: Array<moviesType> },
+  string,
+  { state: RootState }
+>("movies/update-genre-items", async (genreName) => {
+  const genre = genresList.find(
+    (genre) => genre.name.toLowerCase() == genreName
+  );
+
+  return fetch(`http://${apiUrl}/movies/genres/${genreName}`)
+    .then((res) => {
+      return res.json();
+    })
+    .then((body: Array<moviesType>) => {
+      console.log({ genreName: genreName, data: body });
+
+      return { genre: genre!, data: body };
+    });
+});
+
 const fetchGenre = createAsyncThunk<
   Array<{ genre: genreType; movie: moviesType }>,
   undefined,
@@ -258,6 +292,7 @@ const fetchGenre = createAsyncThunk<
               isInFlag = true;
               return false;
             }
+
             return true;
           });
           if (!isInFlag) {
@@ -290,11 +325,26 @@ const moviesSlice = createSlice({
       state.detailMovies.push(action.payload);
       return state;
     });
+    builder.addCase(fetchGenreItems.fulfilled, (state, action) => {
+      const genre = state.genres.find(
+        (val) => val.genreName.toLowerCase() == action.payload.genre.name
+      );
+      if (!genre) {
+        state.genres.push({
+          genreName: action.payload.genre.name,
+          page: 0,
+          id: action.payload.genre.id,
+          movies: action.payload.data,
+        });
+        return state;
+      }
+      genre!.movies = [...genre!.movies, ...action.payload.data];
+      return state;
+    });
     builder.addCase(fetchRecommendedAndSimilar.fulfilled, (state, action) => {
       const movie = state.detailMovies.find(
         (movie) => movie.id === action.payload.movieId
       );
-
       movie!.recommendations = [...action.payload.recommendations];
       movie!.similar = [...action.payload.similar];
       return state;
@@ -310,6 +360,8 @@ export {
   genresList,
   moviesActions,
   fetchPopular,
+  fetchSearch,
+  fetchGenreItems,
   fetchGenre,
   fetchRecommendedAndSimilar,
   fetchMovieDetail,

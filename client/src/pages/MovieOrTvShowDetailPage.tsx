@@ -13,7 +13,7 @@ import store, { RootState } from "../store";
 import { detailedMoviesType, fetchMovieDetail } from "../store/movies-slice";
 import ScrollableRow from "../components/ScrollableRow";
 import MovieDetailTable from "../components/MovieDetailTable";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import LoadingContent from "../components/LoadingContent";
 
 let isInitial = 0;
@@ -22,6 +22,7 @@ const MovieOrTvShowDetilPage: React.FC = () => {
   const id = Number(useParams<{ id: string }>()["id"]);
 
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   const movieData = useSelector(
     (state: RootState) => state.movies.detailMovies
@@ -60,7 +61,6 @@ const MovieOrTvShowDetilPage: React.FC = () => {
         <Grid item xs={8}>
           <Box className="flex flex-col h-full justify-center gap-3 pl-[9.3rem] pr-6">
             {isLoading && <LoadingContent></LoadingContent>}
-
             {!isLoading && (
               <>
                 {" "}
@@ -88,6 +88,9 @@ const MovieOrTvShowDetilPage: React.FC = () => {
                 <Box className="flex gap-2">
                   {movie?.genres.map((genre) => (
                     <Button
+                      onClick={() => {
+                        navigate(`/movie/genre/${genre.name.toLowerCase()}`);
+                      }}
                       key={genre.id}
                       className="bg-zinc-700 text-zinc-200"
                       size="small"
@@ -133,7 +136,7 @@ const MovieOrTvShowDetilPage: React.FC = () => {
             <>
               <img
                 className={`w-full mb-12 ${isLoading && "hidden"}`}
-                src={`https://image.tmdb.org/t/p/w500${movie?.posterPath}`}
+                src={`https://image.tmdb.org/t/p/w780/${movie?.posterPath}`}
                 alt=""
                 onLoad={() => {
                   setIsLoading(false);
