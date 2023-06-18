@@ -12,12 +12,20 @@ import {
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
 import React, { useState } from "react";
-import { Link as LinkReactRouter } from "react-router-dom";
+import { Link as LinkReactRouter, useNavigate } from "react-router-dom";
 
-const pages = ["Movies", "Tv Series", "Downloads"];
+const pages = [
+  { title: "Movies", path: "/" },
+  { title: "Tv Series", path: "/" },
+  { title: "Genres", path: "/movie/genre" },
+  { title: "Search", path: "/movie/search" },
+  { title: "Downloads", path: "/" },
+];
 const settings = ["Profile", "Account", "Logout"];
 
 const TopAppBar = () => {
+  const navigate = useNavigate();
+
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
@@ -52,7 +60,14 @@ const TopAppBar = () => {
             transformOrigin={{ horizontal: "left", vertical: "top" }}
           >
             {pages.map((page) => (
-              <MenuItem key={page}>{page}</MenuItem>
+              <MenuItem
+                key={page.title}
+                onClick={() => {
+                  navigate(page.path);
+                }}
+              >
+                {page.title}
+              </MenuItem>
             ))}
           </Menu>
         </Box>
@@ -66,12 +81,12 @@ const TopAppBar = () => {
             {pages.map((page) => (
               <Link
                 component={LinkReactRouter}
-                key={page}
+                key={page.title}
                 className="text-white block cursor-pointer"
                 underline="none"
-                to={""}
+                to={page.path}
               >
-                {page}
+                {page.title}
               </Link>
             ))}
           </Box>
