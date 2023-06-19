@@ -1,9 +1,12 @@
 import { Box, Button, Typography } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
-const Hero: React.FC = () => {
+const Hero: React.FC<{ img: string; description: string }> = (props) => {
   return (
-    <Box className="flex items-end  md:h-[calc(100vh)] h-[calc(93vh)] -mb-28 bg-cover  bg-center md:bg-left w-full bg-[url('https://image.tmdb.org/t/p/original/foGkPxpw9h8zln81j63mix5B7m8.jpg')]">
+    <Box
+      className={`flex items-end  md:h-[calc(100vh)] h-[calc(93vh)] -mb-28 bg-cover  bg-center md:bg-left w-full`}
+      sx={{ backgroundImage: `url(${props.img})` }}
+    >
       <Box
         sx={{
           background: {
@@ -31,9 +34,7 @@ const Hero: React.FC = () => {
               component="h3"
               className="text-zinc-300 leading-5"
             >
-              Geralt of Rivia, a mutated monster-hunter for hire, journeys
-              toward his destiny in a turbulent world where people often prove
-              more wicked than beasts.
+              {props.description}
             </Typography>
           </Box>
           <Box className=" max-con flex gap-6 md:justify-start justify-center">

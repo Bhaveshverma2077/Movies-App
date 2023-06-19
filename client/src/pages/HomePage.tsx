@@ -27,7 +27,12 @@ const HomePage: React.FC = () => {
   return (
     <>
       <Box className="flex flex-col gap-12">
-        <Hero></Hero>
+        <Hero
+          img="https://image.tmdb.org/t/p/original/foGkPxpw9h8zln81j63mix5B7m8.jpg"
+          description="Geralt of Rivia, a mutated monster-hunter for hire, journeys
+              toward his destiny in a turbulent world where people often prove
+              more wicked than beasts."
+        ></Hero>
         <ScrollableRow
           posterOrBackdrop="POSTER"
           title="Featured Movies"
