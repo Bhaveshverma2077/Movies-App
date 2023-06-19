@@ -1,11 +1,15 @@
 import { Box, Button, Typography } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 
-const Hero: React.FC<{ img: string; description: string }> = (props) => {
+const startingImgUrl = "https://image.tmdb.org/t/p/original";
+
+const Hero: React.FC<{ img: string; logoImg: string; description: string }> = (
+  props
+) => {
   return (
     <Box
       className={`flex items-end  md:h-[calc(100vh)] h-[calc(93vh)] -mb-28 bg-cover  bg-center md:bg-left w-full`}
-      sx={{ backgroundImage: `url(${props.img})` }}
+      sx={{ backgroundImage: `url(${startingImgUrl}${props.img})` }}
     >
       <Box
         sx={{
@@ -22,11 +26,7 @@ const Hero: React.FC<{ img: string; description: string }> = (props) => {
           sx={{ transform: "translate(0,-2rem)" }}
         >
           <Box className="max-w-[28rem] md:min-w-[22rem] w-72 md:w-[34vw] flex">
-            <img
-              className="w-full"
-              src="https://image.tmdb.org/t/p/original/x3uBgefbFC8blsE4Sbdi0m2a71d.png"
-              alt="The Witcher logo"
-            />
+            <img className="w-full" src={`${startingImgUrl}${props.logoImg}`} />
           </Box>
           <Box className="max-w-[24rem] ">
             <Typography

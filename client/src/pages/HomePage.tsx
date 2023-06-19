@@ -28,7 +28,8 @@ const HomePage: React.FC = () => {
     <>
       <Box className="flex flex-col gap-12">
         <Hero
-          img="https://image.tmdb.org/t/p/original/foGkPxpw9h8zln81j63mix5B7m8.jpg"
+          img="/foGkPxpw9h8zln81j63mix5B7m8.jpg"
+          logoImg="/x3uBgefbFC8blsE4Sbdi0m2a71d.png"
           description="Geralt of Rivia, a mutated monster-hunter for hire, journeys
               toward his destiny in a turbulent world where people often prove
               more wicked than beasts."
