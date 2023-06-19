@@ -45,6 +45,7 @@ class ApiTvShowData {
 type ApiMovieById = {
   adult: boolean;
   backdrop_path: string;
+  images: { logos: Array<{ file_path: string }> };
   belongs_to_collection: {
     id: number;
     name: string;

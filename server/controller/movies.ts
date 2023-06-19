@@ -278,11 +278,14 @@ const getSearchMovie = (req: Request, res: Response, next: NextFunction) => {
 
 const getMovieById = (req: Request, res: Response, next: NextFunction) => {
   Promise.all([
-    fetch(`https://api.themoviedb.org/3/movie/${req.params.id}`, {
-      headers: {
-        Authorization: `Bearer ${process.env.API_KEY}`,
-      },
-    }).then((response) => {
+    fetch(
+      `https://api.themoviedb.org/3/movie/${req.params.id}?append_to_response=videos,images`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.API_KEY}`,
+        },
+      }
+    ).then((response) => {
       if (!response.ok) {
         throw new Error("something went wrong");
       }
@@ -315,6 +318,7 @@ const getMovieById = (req: Request, res: Response, next: NextFunction) => {
         belongsToCollection: body[0].belongs_to_collection,
         genres: body[0].genres,
         moviesWatchProvider: moviesWatchProvider,
+        logoPath: body[0].images.logos[0].file_path,
         homepage: body[0].homepage,
         id: body[0].id,
         imdbId: body[0].imdb_id,
