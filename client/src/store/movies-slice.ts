@@ -111,6 +111,7 @@ type detailedMoviesType = {
     backdrop_path: string;
   };
   genres: Array<{ id: number; name: "string" }>;
+  logoPath: string;
   moviesWatchProvider: Array<{
     logoPath: string;
     providerName: string;
@@ -140,6 +141,7 @@ type moviesInitialSateType = {
   discover: movieStateType;
   genres: genresType;
   popular: movieStateType;
+  inTheatres: movieStateType;
   detailMovies: Array<detailedMoviesType>;
   genrePageMovies: Array<{ genre: genreType; movie: moviesType }>;
   latest: movieStateType;
@@ -150,6 +152,7 @@ type moviesInitialSateType = {
 const moviesInitialSate: moviesInitialSateType = {
   latest: { page: 0, movies: [] },
   popular: { page: 0, movies: [] },
+  inTheatres: { page: 0, movies: [] },
   discover: { page: 0, movies: [] },
   detailMovies: [],
   genres: [],
@@ -167,6 +170,48 @@ const fetchPopular = createAsyncThunk<
 
   return fetch(
     `http://${apiUrl}/movies/popular?page=${state.movies.popular.page + 1}`
+  )
+    .then((res) => res.json())
+    .then((body: Array<moviesType>) => body);
+});
+
+const fetchTopRated = createAsyncThunk<
+  Array<moviesType>,
+  undefined,
+  { state: RootState }
+>("movies/update-top-rated", async (_, thunkApi) => {
+  const state = thunkApi.getState();
+
+  return fetch(
+    `http://${apiUrl}/movies/top-rated?page=${state.movies.popular.page + 1}`
+  )
+    .then((res) => res.json())
+    .then((body: Array<moviesType>) => body);
+});
+
+const fetchUpcoming = createAsyncThunk<
+  Array<moviesType>,
+  undefined,
+  { state: RootState }
+>("movies/update-upcoming", async (_, thunkApi) => {
+  const state = thunkApi.getState();
+
+  return fetch(
+    `http://${apiUrl}/movies/upcoming?page=${state.movies.popular.page + 1}`
+  )
+    .then((res) => res.json())
+    .then((body: Array<moviesType>) => body);
+});
+
+const fetchInTheatres = createAsyncThunk<
+  Array<moviesType>,
+  undefined,
+  { state: RootState }
+>("movies/update-in-theatres", async (_, thunkApi) => {
+  const state = thunkApi.getState();
+
+  return fetch(
+    `http://${apiUrl}/movies/in-theatres?page=${state.movies.popular.page + 1}`
   )
     .then((res) => res.json())
     .then((body: Array<moviesType>) => body);
@@ -317,6 +362,21 @@ const moviesSlice = createSlice({
       state.popular.movies = [...state.popular.movies, ...action.payload];
       return state;
     });
+    builder.addCase(fetchTopRated.fulfilled, (state, action) => {
+      state.topRated.page += 1;
+      state.topRated.movies = [...state.topRated.movies, ...action.payload];
+      return state;
+    });
+    builder.addCase(fetchUpcoming.fulfilled, (state, action) => {
+      state.upcomming.page += 1;
+      state.upcomming.movies = [...state.upcomming.movies, ...action.payload];
+      return state;
+    });
+    builder.addCase(fetchInTheatres.fulfilled, (state, action) => {
+      state.inTheatres.page += 1;
+      state.inTheatres.movies = [...state.inTheatres.movies, ...action.payload];
+      return state;
+    });
     builder.addCase(fetchGenre.fulfilled, (state, action) => {
       state.genrePageMovies = action.payload;
       return state;
@@ -360,6 +420,9 @@ export {
   genresList,
   moviesActions,
   fetchPopular,
+  fetchTopRated,
+  fetchUpcoming,
+  fetchInTheatres,
   fetchSearch,
   fetchGenreItems,
   fetchGenre,
