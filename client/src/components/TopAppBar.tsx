@@ -15,8 +15,8 @@ import React, { useState } from "react";
 import { Link as LinkReactRouter, useNavigate } from "react-router-dom";
 
 const pages = [
-  { title: "Movies", path: "/" },
-  { title: "Tv Series", path: "/" },
+  { title: "Movies", path: "/movie" },
+  { title: "Tv Series", path: "/tv-show" },
   { title: "Genres", path: "/movie/genre" },
   { title: "Search", path: "/movie/search" },
   { title: "Downloads", path: "/" },
