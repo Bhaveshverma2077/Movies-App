@@ -1,5 +1,3 @@
-import React from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import {
   PaletteColorOptions,
@@ -24,6 +22,8 @@ import Layout from "./pages/Layout";
 import SearchPage from "./pages/SearchPage";
 import path from "path";
 import OneGenrePage from "./pages/OneGenrePage";
+import MoviesPage from "./pages/MoviesPage";
+import TvShowsPage from "./pages/TvShowsPage";
 
 function App() {
   const theme = createTheme({
@@ -51,7 +51,9 @@ function App() {
         { path: "", element: <HomePage /> },
         {
           path: "movie",
+
           children: [
+            { path: "", element: <MoviesPage /> },
             {
               path: "genre",
               children: [
@@ -67,7 +69,12 @@ function App() {
             },
           ],
         },
+        {
+          path: "tv-show",
+          children: [{ path: "", element: <TvShowsPage /> }],
+        },
         { path: "/login", element: <AuthPage /> },
+        { path: "/signup", element: <AuthPage /> },
       ],
     },
   ]);
