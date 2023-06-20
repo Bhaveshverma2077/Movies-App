@@ -46,7 +46,7 @@ const SearchPage: React.FC = () => {
   }, [searchString]);
 
   return (
-    <Box className="flex flex-col w-full items-center gap-12 pt-6  px-8 lg:px-36">
+    <Box className="flex flex-col w-full items-center gap-12 pt-20  px-8 lg:px-36">
       <Box className="flex w-full lg:w-[50%]">
         <Autocomplete
           freeSolo
