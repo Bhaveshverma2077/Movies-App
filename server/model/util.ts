@@ -46,6 +46,7 @@ type ApiMovieById = {
   adult: boolean;
   backdrop_path: string;
   images: { logos: Array<{ file_path: string }> };
+
   belongs_to_collection: {
     id: number;
     name: string;
@@ -71,6 +72,7 @@ type ApiTvShowById = {
   backdrop_path: string;
   in_production: string;
   genres: Array<{ id: number; name: "string" }>;
+  images: { logos: Array<{ file_path: string }> };
   homepage: string;
   id: number;
   overview: string;

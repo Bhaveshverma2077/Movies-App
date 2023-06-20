@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ApiTvShowById, ApiTvShowData } from "../model/util";
+import { log } from "console";
 
 // Helpers
 
@@ -155,6 +156,32 @@ const getTopRated = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
+const getOnNetflix = (req: Request, res: Response, next: NextFunction) => {
+  let params: {} | null = null;
+  if (req.query.page) {
+    params = {
+      page: req.query.page,
+      watch_region: "US",
+      language: "en-US",
+      with_watch_providers: "8",
+    };
+  }
+
+  console.log(params);
+
+  tvShowsHelper("https://api.themoviedb.org/3/discover/tv", params)
+    .then((data) => {
+      console.log(data);
+
+      res.status(200).json(data);
+    })
+    .catch((err) => {
+      console.log(err);
+
+      res.status(400).json({ err: "something went wrong" });
+    });
+};
+
 const getTvShowsAiringToday = (
   req: Request,
   res: Response,
@@ -166,7 +193,10 @@ const getTvShowsAiringToday = (
       page: req.query.page,
     };
   }
-  tvShowsHelper("https://api.themoviedb.org/3/tv/airing_today", params)
+  tvShowsHelper(
+    "https://api.themoviedb.org/3/tv/airing_today?with_origin_country=US",
+    params
+  )
     .then((data) => {
       res.status(200).json(data);
     })
@@ -183,10 +213,13 @@ const getTvShowsOnTheAir = (
   let params: {} | null = null;
   if (req.query.page) {
     params = {
+      language: "en-US",
+      with_origin_country: "US",
+      sort_by: "popularity.desc",
       page: req.query.page,
     };
   }
-  tvShowsHelper("https://api.themoviedb.org/3/tv/on_the_air", params)
+  tvShowsHelper("https://api.themoviedb.org/3/discover/tv", params)
     .then((data) => {
       res.status(200).json(data);
     })
@@ -196,11 +229,14 @@ const getTvShowsOnTheAir = (
 };
 
 const getTvShowById = (req: Request, res: Response, next: NextFunction) => {
-  fetch(`https://api.themoviedb.org/3/tv/${req.params.id}`, {
-    headers: {
-      Authorization: `Bearer ${process.env.API_KEY}`,
-    },
-  })
+  fetch(
+    `https://api.themoviedb.org/3/tv/${req.params.id}?append_to_response=videos,images`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.API_KEY}`,
+      },
+    }
+  )
     .then((response) => {
       if (!response.ok) {
         throw new Error("something went wrong");
@@ -213,6 +249,7 @@ const getTvShowById = (req: Request, res: Response, next: NextFunction) => {
         backdropPath: body.backdrop_path,
         genres: body.genres,
         homepage: body.homepage,
+        logoPath: body.images.logos[0].file_path,
         id: body.id,
         overview: body.overview,
         posterPath: body.poster_path,
@@ -345,6 +382,7 @@ export default {
   getTvShows,
   getPopular,
   getTopRated,
+  getOnNetflix,
   getTvShowsAiringToday,
   getTvShowsOnTheAir,
   getTvShowById,

@@ -13,6 +13,8 @@ router.route("/airing-today").get(tvShowsController.getTvShowsAiringToday);
 
 router.route("/on-the-air").get(tvShowsController.getTvShowsOnTheAir);
 
+router.route("/on-netflix").get(tvShowsController.getOnNetflix);
+
 router.route("/find/:id").get(tvShowsController.getTvShowById);
 
 router.route("/search/:searchString").get(tvShowsController.getSearchTvShow);
