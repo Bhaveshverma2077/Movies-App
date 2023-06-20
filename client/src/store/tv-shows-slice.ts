@@ -11,6 +11,7 @@ type detailedtvShowsType = {
   homepage: string;
   id: number;
   overview: string;
+  logoPath: string;
   posterPath: string;
   firstAirDate: string;
   lastAirDate: string;
@@ -54,18 +55,22 @@ type tvShowsInitialSateType = {
   genres: genresType;
   popular: tvShowsStateType;
   detailTvShows: Array<detailedtvShowsType>;
-  latest: tvShowsStateType;
-  upcomming: tvShowsStateType;
+  airingToday: tvShowsStateType;
+  onTheAir: tvShowsStateType;
+  onNetflix: tvShowsStateType;
+
   topRated: tvShowsStateType;
 };
 
 const tvShowsInitialSate: tvShowsInitialSateType = {
-  latest: { page: 0, tvShows: [] },
+  airingToday: { page: 0, tvShows: [] },
   popular: { page: 0, tvShows: [] },
   discover: { page: 0, tvShows: [] },
+  onNetflix: { page: 0, tvShows: [] },
+
   detailTvShows: [],
   genres: [],
-  upcomming: { page: 0, tvShows: [] },
+  onTheAir: { page: 0, tvShows: [] },
   topRated: { page: 0, tvShows: [] },
 };
 
@@ -93,6 +98,68 @@ const fetchTopRated = createAsyncThunk<
     });
 });
 
+const fetchAiringToday = createAsyncThunk<
+  Array<tvShowsType>,
+  undefined,
+  { state: RootState }
+>("tvshows/update-airing-today", async (_, thunkApi) => {
+  const state = thunkApi.getState();
+
+  return fetch(
+    `http://${apiUrl}/tv-shows/airing-today?page=${
+      state.tvs.airingToday.page + 1
+    }`
+  )
+    .then((res) => res.json())
+    .then((body: Array<tvShowsType>) => body);
+});
+
+const fetchOnTheAir = createAsyncThunk<
+  Array<tvShowsType>,
+  undefined,
+  { state: RootState }
+>("tvshows/update-on-the-air", async (_, thunkApi) => {
+  const state = thunkApi.getState();
+
+  return fetch(
+    `http://${apiUrl}/tv-shows/on-the-air?page=${state.tvs.onTheAir.page + 1}`
+  )
+    .then((res) => res.json())
+    .then((body: Array<tvShowsType>) => body);
+});
+
+const fetchOnNetflix = createAsyncThunk<
+  Array<tvShowsType>,
+  undefined,
+  { state: RootState }
+>("tvshows/update-on-netflix", async (_, thunkApi) => {
+  const state = thunkApi.getState();
+
+  return fetch(
+    `http://${apiUrl}/tv-shows/on-netflix?page=${state.tvs.onTheAir.page + 1}`
+  )
+    .then((res) => res.json())
+    .then((body: Array<tvShowsType>) => body);
+});
+
+const fetchTvShowDetail = createAsyncThunk<
+  detailedtvShowsType,
+  number,
+  { state: RootState }
+>("tvshows/update-tv-show-detail", async (id) => {
+  console.log(id);
+
+  return fetch(`http://${apiUrl}/tv-shows/find/${id}`)
+    .then((res) => {
+      return res.json();
+    })
+    .then((body: detailedtvShowsType) => {
+      console.log(body);
+      // store.dispatch(fetchRecommendedAndSimilar(id));
+      return body;
+    });
+});
+
 const tvShowsSlice = createSlice({
   name: "tvshows",
   initialState: tvShowsInitialSate,
@@ -108,6 +175,28 @@ const tvShowsSlice = createSlice({
       state.topRated.tvShows = [...state.topRated.tvShows, ...action.payload];
       return state;
     });
+    builder.addCase(fetchAiringToday.fulfilled, (state, action) => {
+      state.airingToday.page += 1;
+      state.airingToday.tvShows = [
+        ...state.airingToday.tvShows,
+        ...action.payload,
+      ];
+      return state;
+    });
+    builder.addCase(fetchOnTheAir.fulfilled, (state, action) => {
+      state.onTheAir.page += 1;
+      state.onTheAir.tvShows = [...state.onTheAir.tvShows, ...action.payload];
+      return state;
+    });
+    builder.addCase(fetchOnNetflix.fulfilled, (state, action) => {
+      state.onNetflix.page += 1;
+      state.onNetflix.tvShows = [...state.onNetflix.tvShows, ...action.payload];
+      return state;
+    });
+    builder.addCase(fetchTvShowDetail.fulfilled, (state, action) => {
+      state.detailTvShows.push(action.payload);
+      return state;
+    });
   },
 });
 
@@ -115,6 +204,14 @@ const tvShowsActions = tvShowsSlice.actions;
 
 export type { tvShowsStateType, tvShowsType };
 
-export { tvShowsActions, fetchPopular };
+export {
+  tvShowsActions,
+  fetchPopular,
+  fetchTopRated,
+  fetchOnNetflix,
+  fetchAiringToday,
+  fetchOnTheAir,
+  fetchTvShowDetail,
+};
 
 export default tvShowsSlice;

@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import Hero from "../components/Hero";
 import ScrollableRow from "../components/ScrollableRow";
 import { Box } from "@mui/material";
+import { fetchOnNetflix } from "../store/tv-shows-slice";
 
 const MoviesPage: React.FC = () => {
   const popularMovies = useSelector((state: RootState) => state.movies.popular);
@@ -56,40 +57,44 @@ const MoviesPage: React.FC = () => {
     return <></>;
 
   return (
-    <Box className="flex flex-col gap-8">
+    <Box className="flex flex-col gap-36 md:gap-12">
       <Hero
-        img={moviesDetail.backdropPath}
+        img={
+          "https://www.themoviedb.org/t/p/original/tfw5LKySp7uEYJ3CUuD4TKx3s8y.jpg"
+        }
         logoImg={moviesDetail.logoPath}
         description={moviesDetail.overview}
       />
-      <ScrollableRow
-        title="Popular Movies"
-        width={"16rem"}
-        height={"9rem"}
-        posterOrBackdrop="BACKDROP"
-        moviesData={popularMovies}
-      />
-      <ScrollableRow
-        title="Top Rated Movies"
-        width={"16rem"}
-        height={"9rem"}
-        posterOrBackdrop="BACKDROP"
-        moviesData={topRatedMovies}
-      />
-      <ScrollableRow
-        title="Upcoming Movies"
-        width={"10rem"}
-        height={"15rem"}
-        posterOrBackdrop="POSTER"
-        moviesData={upcomingMovies}
-      />
-      <ScrollableRow
-        title="Movies In Theatres"
-        width={"10rem"}
-        height={"15rem"}
-        posterOrBackdrop="POSTER"
-        moviesData={inTheatresMovies}
-      />
+      <Box className="flex flex-col gap-8">
+        <ScrollableRow
+          title="Popular Movies"
+          width={"16rem"}
+          height={"9rem"}
+          posterOrBackdrop="BACKDROP"
+          moviesData={popularMovies}
+        />
+        <ScrollableRow
+          title="Top Rated Movies"
+          width={"16rem"}
+          height={"9rem"}
+          posterOrBackdrop="BACKDROP"
+          moviesData={topRatedMovies}
+        />
+        <ScrollableRow
+          title="Upcoming Movies"
+          width={"10rem"}
+          height={"15rem"}
+          posterOrBackdrop="POSTER"
+          moviesData={upcomingMovies}
+        />
+        <ScrollableRow
+          title="Movies In Theatres"
+          width={"10rem"}
+          height={"15rem"}
+          posterOrBackdrop="POSTER"
+          moviesData={inTheatresMovies}
+        />
+      </Box>
     </Box>
   );
 };
