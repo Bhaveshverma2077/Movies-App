@@ -318,7 +318,7 @@ const getMovieById = (req: Request, res: Response, next: NextFunction) => {
         belongsToCollection: body[0].belongs_to_collection,
         genres: body[0].genres,
         moviesWatchProvider: moviesWatchProvider,
-        logoPath: body[0].images.logos[0].file_path,
+        logoPath: body[0].images.logos[0]?.file_path,
         homepage: body[0].homepage,
         id: body[0].id,
         imdbId: body[0].imdb_id,

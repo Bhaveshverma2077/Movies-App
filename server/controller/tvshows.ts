@@ -249,7 +249,7 @@ const getTvShowById = (req: Request, res: Response, next: NextFunction) => {
         backdropPath: body.backdrop_path,
         genres: body.genres,
         homepage: body.homepage,
-        logoPath: body.images.logos[0].file_path,
+        logoPath: body.images.logos[0]?.file_path,
         id: body.id,
         overview: body.overview,
         posterPath: body.poster_path,
