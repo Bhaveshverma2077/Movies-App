@@ -10,6 +10,7 @@ import store from "../store";
 import { moviesType } from "../store/movies-slice";
 import OneGenreItem from "../components/OneGenreItem";
 import { useNavigate, useParams } from "react-router-dom";
+import PaddingTopWrapper from "../components/PaddingTopWrapper";
 
 const SearchPage: React.FC = () => {
   const routeParams = useParams<{ searchString: string }>();
@@ -46,7 +47,7 @@ const SearchPage: React.FC = () => {
   }, [searchString]);
 
   return (
-    <Box className="flex flex-col w-full items-center gap-12 pt-20  px-8 lg:px-36">
+    <Box className="flex flex-col w-full items-center gap-12 px-8 lg:px-36">
       <Box className="flex w-full lg:w-[50%]">
         <Autocomplete
           freeSolo

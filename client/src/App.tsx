@@ -1,29 +1,29 @@
-import "./App.css";
+import { Provider } from "react-redux";
+
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+
 import {
-  PaletteColorOptions,
   ThemeProvider,
   createTheme,
   StyledEngineProvider,
   CssBaseline,
 } from "@mui/material";
 
+import "./App.css";
+
+import Layout from "./pages/Layout";
 import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
-import { Provider } from "react-redux";
-import store from "./store";
 import GenrePage from "./pages/GenrePage";
-import MovieOrTvShowDetailPage from "./pages/MovieOrTvShowDetailPage";
-import {
-  RouterProvider,
-  createBrowserRouter,
-  useLocation,
-} from "react-router-dom";
-import Layout from "./pages/Layout";
-import SearchPage from "./pages/SearchPage";
-import path from "path";
-import OneGenrePage from "./pages/OneGenrePage";
 import MoviesPage from "./pages/MoviesPage";
+import SearchPage from "./pages/SearchPage";
+import MovieOrTvShowDetailPage from "./pages/MovieOrTvShowDetailPage";
+import OneGenrePage from "./pages/OneGenrePage";
 import TvShowsPage from "./pages/TvShowsPage";
+
+import PaddingTopWrapper from "./components/PaddingTopWrapper";
+
+import store from "./store";
 
 function App() {
   const theme = createTheme({
@@ -57,14 +57,40 @@ function App() {
             {
               path: "genre",
               children: [
-                { path: ":genreName", element: <OneGenrePage /> },
-                { path: "", element: <GenrePage /> },
+                {
+                  path: ":genreName",
+                  element: (
+                    // PaddingTopWrapper: gives top padding to pages because of AppBar absolute positioning
+                    <PaddingTopWrapper pt={4}>
+                      <OneGenrePage />
+                    </PaddingTopWrapper>
+                  ),
+                },
+                {
+                  path: "",
+                  element: (
+                    <PaddingTopWrapper pt={8}>
+                      <GenrePage />
+                    </PaddingTopWrapper>
+                  ),
+                },
               ],
             },
-            { path: ":id", element: <MovieOrTvShowDetailPage /> },
+            {
+              path: ":id",
+              element: (
+                <PaddingTopWrapper pt={6}>
+                  <MovieOrTvShowDetailPage />
+                </PaddingTopWrapper>
+              ),
+            },
             {
               path: "search",
-              element: <SearchPage />,
+              element: (
+                <PaddingTopWrapper pt={10}>
+                  <SearchPage />
+                </PaddingTopWrapper>
+              ),
               children: [{ path: ":searchString" }],
             },
           ],
