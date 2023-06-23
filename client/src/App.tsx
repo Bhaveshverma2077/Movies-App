@@ -1,6 +1,10 @@
 import { Provider } from "react-redux";
 
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  useParams,
+} from "react-router-dom";
 
 import {
   ThemeProvider,
@@ -17,15 +21,18 @@ import HomePage from "./pages/HomePage";
 import GenrePage from "./pages/GenrePage";
 import MoviesPage from "./pages/MoviesPage";
 import SearchPage from "./pages/SearchPage";
-import MovieOrTvShowDetailPage from "./pages/MovieOrTvShowDetailPage";
+import MovieDetailPage from "./pages/MovieDetailPage";
 import OneGenrePage from "./pages/OneGenrePage";
 import TvShowsPage from "./pages/TvShowsPage";
 
 import PaddingTopWrapper from "./components/PaddingTopWrapper";
 
 import store from "./store";
+import TvShowDetailPage from "./pages/TvShowDetailPage";
 
 function App() {
+  const params = useParams();
+
   const theme = createTheme({
     palette: { mode: "dark", primary: { main: "#E50914" } },
     typography: {
@@ -78,11 +85,7 @@ function App() {
             },
             {
               path: ":id",
-              element: (
-                <PaddingTopWrapper pt={6}>
-                  <MovieOrTvShowDetailPage />
-                </PaddingTopWrapper>
-              ),
+              element: <MovieDetailPage />,
             },
             {
               path: "search",
@@ -97,7 +100,41 @@ function App() {
         },
         {
           path: "tv-show",
-          children: [{ path: "", element: <TvShowsPage /> }],
+          children: [
+            { path: "", element: <TvShowsPage /> },
+            {
+              path: "search",
+              element: (
+                <PaddingTopWrapper pt={10}>
+                  <SearchPage />
+                </PaddingTopWrapper>
+              ),
+              children: [{ path: ":searchString" }],
+            },
+            {
+              path: "genre",
+              children: [
+                {
+                  path: ":genreName",
+                  element: (
+                    // PaddingTopWrapper: gives top padding to pages because of AppBar absolute positioning
+                    <PaddingTopWrapper pt={4}>
+                      <OneGenrePage />
+                    </PaddingTopWrapper>
+                  ),
+                },
+                {
+                  path: "",
+                  element: (
+                    <PaddingTopWrapper pt={8}>
+                      <GenrePage />
+                    </PaddingTopWrapper>
+                  ),
+                },
+              ],
+            },
+            { path: ":id", element: <TvShowDetailPage /> },
+          ],
         },
         { path: "/login", element: <AuthPage /> },
         { path: "/signup", element: <AuthPage /> },

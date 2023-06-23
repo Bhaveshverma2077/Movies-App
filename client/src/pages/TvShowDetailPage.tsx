@@ -1,81 +1,62 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Grid,
-  Rating,
-  Skeleton,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Grid, Rating, Skeleton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import store, { RootState } from "../store";
-import { detailedMoviesType, fetchMovieDetail } from "../store/movies-slice";
 import ScrollableRow from "../components/ScrollableRow";
-import MovieDetailTable from "../components/MovieDetailTable";
 import { useNavigate, useParams } from "react-router-dom";
 import LoadingContent from "../components/LoadingContent";
+import {
+  detailedtvShowsType,
+  fetchTvShowDetail,
+} from "../store/tv-shows-slice";
 
-let isInitial = 0;
-
-const MovieOrTvShowDetilPage: React.FC = () => {
+const TvShowDetailPage: React.FC = () => {
   const id = Number(useParams<{ id: string }>()["id"]);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isImageLoading, setImageLoading] = useState(true);
+
   const navigate = useNavigate();
 
-  const movieData = useSelector(
-    (state: RootState) => state.movies.detailMovies
+  const status = useSelector(
+    (state: RootState) => state.tvs.detailTvShowStatus
   );
 
-  let movie: detailedMoviesType | undefined = movieData.find(
-    (movie) => movie.id == id
-  );
+  const tvShowData = useSelector((state: RootState) => state.tvs.detailTvShows);
 
-  //***************************************** */
-  // to handle the first two movie.path undefined and then movie.path defined or undefined
-  isInitial += 1;
+  let tvshow: detailedtvShowsType | undefined = tvShowData.find(
+    (tvShow) => tvShow.id == id
+  );
 
   useEffect(() => {
-    setIsLoading(true);
-    isInitial = 1;
+    store.dispatch(fetchTvShowDetail(id));
+    setImageLoading(true);
   }, [id]);
 
   useEffect(() => {
-    if (!movie?.posterPath && isInitial >= 2) {
-      setIsLoading(false);
+    if (status == "NOTLOADING" && !tvshow?.posterPath) {
+      setImageLoading(false);
     }
-  }, [movie?.id]);
-
-  //************************************* */
-
-  useEffect(() => {
-    if (!movie) {
-      store.dispatch(fetchMovieDetail(id));
-    }
-  }, [id]);
-
+  }, [status]);
   return (
     <>
       <Grid container>
         <Grid item xs={8}>
           <Box className="flex flex-col h-full justify-center gap-3 pl-[9.3rem] pr-6">
-            {isLoading && <LoadingContent></LoadingContent>}
-            {!isLoading && (
+            {status == "LOADING" && <LoadingContent />}
+            {status == "NOTLOADING" && (
               <>
-                {" "}
                 <Typography className="text-5xl lg:text-6xl" component="h1">
-                  {movie?.title}
+                  {tvshow?.name}
                 </Typography>
                 <Box className="flex gap-2 items-center">
                   <Rating
                     name="read-only"
-                    value={movie?.rating ? movie?.rating / 2 : 0}
+                    value={tvshow?.rating ? tvshow?.rating / 2 : 0}
                     precision={0.25}
                     readOnly
                   />
                   <Typography variant="subtitle2">
-                    ({movie?.ratingCount})
+                    ({tvshow?.ratingCount})
                   </Typography>
                 </Box>
                 <Typography
@@ -83,13 +64,13 @@ const MovieOrTvShowDetilPage: React.FC = () => {
                   variant="subtitle1"
                   component="h2"
                 >
-                  {movie?.overview}
+                  {tvshow?.overview}
                 </Typography>
                 <Box className="flex gap-2">
-                  {movie?.genres.map((genre) => (
+                  {tvshow?.genres.map((genre) => (
                     <Button
                       onClick={() => {
-                        navigate(`/movie/genre/${genre.name.toLowerCase()}`);
+                        navigate(`/tvshow/genre/${genre.name.toLowerCase()}`);
                       }}
                       key={genre.id}
                       className="bg-zinc-700 text-zinc-200"
@@ -106,13 +87,13 @@ const MovieOrTvShowDetilPage: React.FC = () => {
                   ))}
                 </Box>
                 <Box className="pt-12"></Box>
-                {movie?.moviesWatchProvider.length === 0 ? (
+                {tvshow?.tvShowWatchProvider.length === 0 ? (
                   <Typography variant="body1">
                     Currently Not available for streaming
                   </Typography>
                 ) : (
                   <Box className="flex items-center gap-3">
-                    {movie?.moviesWatchProvider.map((provider) => (
+                    {tvshow?.tvShowWatchProvider.map((provider) => (
                       <Box className="w-12" key={provider.providerName}>
                         {" "}
                         <img
@@ -125,43 +106,15 @@ const MovieOrTvShowDetilPage: React.FC = () => {
                   </Box>
                 )}
                 <Typography variant="h6">
-                  {movie?.releaseDate.substring(0, 4)}
+                  {tvshow?.firstAirDate.substring(0, 4)}
                 </Typography>
               </>
             )}
           </Box>
         </Grid>
         <Grid item xs={4}>
-          {movie?.posterPath ? (
-            <>
-              <img
-                className={`w-full mb-12 ${isLoading && "hidden"}`}
-                src={`https://image.tmdb.org/t/p/w780/${movie?.posterPath}`}
-                alt=""
-                onLoad={() => {
-                  setIsLoading(false);
-                }}
-              />
-              {isLoading && (
-                <Box className="w-full mb-12 p-4" sx={{ aspectRatio: "2 / 3" }}>
-                  <Skeleton
-                    sx={{ transform: "none" }}
-                    className="w-full h-full"
-                    component={"div"}
-                  ></Skeleton>
-                </Box>
-              )}
-            </>
-          ) : !isLoading ? (
-            <Box
-              className={`w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-200`}
-            >
-              <Typography className="my-auto" variant="subtitle1">
-                Preview Not Available
-              </Typography>
-            </Box>
-          ) : (
-            <Box className="w-full mb-12 p-6" sx={{ aspectRatio: "2 / 3" }}>
+          {(status == "LOADING" || isImageLoading) && (
+            <Box className="w-full mb-12 p-4" sx={{ aspectRatio: "2 / 3" }}>
               <Skeleton
                 sx={{ transform: "none" }}
                 className="w-full h-full"
@@ -169,35 +122,54 @@ const MovieOrTvShowDetilPage: React.FC = () => {
               ></Skeleton>
             </Box>
           )}
+          {status == "NOTLOADING" && !tvshow?.posterPath && (
+            <Box
+              className={`w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-200`}
+            >
+              <Typography className="my-auto" variant="subtitle1">
+                Preview Not Available
+              </Typography>
+            </Box>
+          )}
+          {tvshow?.posterPath && (
+            <img
+              className={`w-full mb-12 ${isImageLoading ? "hidden" : ""}`}
+              src={`https://image.tmdb.org/t/p/w780/${tvshow?.posterPath}`}
+              alt=""
+              onLoad={() => setImageLoading(false)}
+              onError={() => setImageLoading(false)}
+            />
+          )}
         </Grid>
         <Grid item xs={8}>
           <Box className="flex w-[100%] flex-col gap-12 p-6">
-            {movie && movie.recommendations && (
+            {tvshow && tvshow.recommendations && (
               <ScrollableRow
                 posterOrBackdrop="BACKDROP"
                 title="Recommendations"
                 height={"9rem"}
                 width={"16rem"}
-                moviesData={{ page: 0, movies: movie.recommendations }}
+                tvShowsData={{ page: 0, tvShows: tvshow.recommendations }}
               />
             )}
-            {movie && movie.similar && (
+            {tvshow && tvshow.similar && (
               <ScrollableRow
                 posterOrBackdrop="POSTER"
                 height={"15rem"}
                 width={"10rem"}
                 title="Similar"
-                moviesData={{ page: 0, movies: movie.similar }}
+                tvShowsData={{ page: 0, tvShows: tvshow.similar }}
               />
             )}
           </Box>
         </Grid>
+
         <Grid item xs={4}>
-          <MovieDetailTable movie={movie}></MovieDetailTable>
+          {/* <tvshowDetailTable tvshow={tvshow}></tvshowDetailTable> */}
         </Grid>
       </Grid>
     </>
   );
 };
 
-export default MovieOrTvShowDetilPage;
+export default TvShowDetailPage;
