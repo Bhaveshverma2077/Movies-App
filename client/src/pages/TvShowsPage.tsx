@@ -12,6 +12,7 @@ import { useSelector } from "react-redux";
 import Hero from "../components/Hero";
 import ScrollableRow from "../components/ScrollableRow";
 import { Box } from "@mui/material";
+import ScrollableRowTile from "../components/ScrollableRowTile";
 
 const tvShowHeroIndex = 2;
 
@@ -32,7 +33,7 @@ const TvShowsPage: React.FC = () => {
 
   const tvshowsDetail = useSelector((state: RootState) =>
     state.tvs.detailTvShows.find(
-      (tvShow) => tvShow.id == popularTvShows.tvShows[tvShowHeroIndex].id
+      (tvShow) => tvShow.id == popularTvShows.tvShows[tvShowHeroIndex]?.id
     )
   );
 
@@ -41,7 +42,6 @@ const TvShowsPage: React.FC = () => {
     store.dispatch(fetchTopRated());
     store.dispatch(fetchOnTheAir());
     store.dispatch(fetchAiringToday());
-
     store.dispatch(fetchOnNetflix());
   }, []);
 
@@ -74,34 +74,78 @@ const TvShowsPage: React.FC = () => {
         }
       />
       <Box className="flex flex-col gap-8">
-        <ScrollableRow
-          title="Popular Tv Shows"
-          width={"16rem"}
-          height={"9rem"}
-          posterOrBackdrop="BACKDROP"
-          tvShowsData={popularTvShows}
-        />
-        <ScrollableRow
-          title="Top Rated Tv Shows"
-          width={"16rem"}
-          height={"9rem"}
-          posterOrBackdrop="BACKDROP"
-          tvShowsData={topRatedTvShows}
-        />
-        <ScrollableRow
-          title="On Netflix"
-          width={"10rem"}
-          height={"15rem"}
-          posterOrBackdrop="POSTER"
-          tvShowsData={onNetflixTvShows}
-        />
-        <ScrollableRow
-          title="On The Air"
-          width={"10rem"}
-          height={"15rem"}
-          posterOrBackdrop="POSTER"
-          tvShowsData={onTheAirTvShows}
-        />
+        {popularTvShows &&
+          popularTvShows.tvShows &&
+          popularTvShows.tvShows.length != 0 && (
+            <ScrollableRow
+              title="Popular Tv Shows"
+              components={popularTvShows.tvShows.map((data) => (
+                <ScrollableRowTile
+                  posterOrBackdrop={"BACKDROP"}
+                  key={data.id}
+                  height={"9rem"}
+                  width={"16rem"}
+                  tvShow={data}
+                ></ScrollableRowTile>
+              ))}
+              height={"9rem"}
+              width={"16rem"}
+            />
+          )}
+        {topRatedTvShows &&
+          topRatedTvShows.tvShows &&
+          topRatedTvShows.tvShows.length != 0 && (
+            <ScrollableRow
+              title="Top Rated Tv Shows"
+              components={topRatedTvShows.tvShows.map((data) => (
+                <ScrollableRowTile
+                  posterOrBackdrop={"BACKDROP"}
+                  key={data.id}
+                  height={"9rem"}
+                  width={"16rem"}
+                  tvShow={data}
+                ></ScrollableRowTile>
+              ))}
+              height={"9rem"}
+              width={"16rem"}
+            />
+          )}
+        {onNetflixTvShows &&
+          onNetflixTvShows.tvShows &&
+          onNetflixTvShows.tvShows.length != 0 && (
+            <ScrollableRow
+              title="On Netflix"
+              components={onNetflixTvShows.tvShows.map((data) => (
+                <ScrollableRowTile
+                  posterOrBackdrop={"POSTER"}
+                  key={data.id}
+                  height={"15rem"}
+                  width={"10rem"}
+                  tvShow={data}
+                ></ScrollableRowTile>
+              ))}
+              height={"15rem"}
+              width={"10rem"}
+            />
+          )}
+        {onTheAirTvShows &&
+          onTheAirTvShows.tvShows &&
+          onTheAirTvShows.tvShows.length != 0 && (
+            <ScrollableRow
+              title="On The Air"
+              components={onTheAirTvShows.tvShows.map((data) => (
+                <ScrollableRowTile
+                  posterOrBackdrop={"POSTER"}
+                  key={data.id}
+                  height={"15rem"}
+                  width={"10rem"}
+                  tvShow={data}
+                ></ScrollableRowTile>
+              ))}
+              height={"15rem"}
+              width={"10rem"}
+            />
+          )}
       </Box>
     </Box>
   );

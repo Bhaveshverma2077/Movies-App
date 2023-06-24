@@ -4,16 +4,11 @@ import { Box, IconButton, Typography } from "@mui/material";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-import { tvShowsStateType } from "../store/tv-shows-slice";
-import { movieStateType } from "../store/movies-slice";
-import ScrollableRowTile from "./ScrollableRowTile";
 import ScrollableRowSkeleton from "./ScrollableRowSkeleton";
 
 interface Props {
   title: string;
-  moviesData?: movieStateType; // only renders movies if both movieData and tvShowsData is Provided
-  tvShowsData?: tvShowsStateType; //
-  posterOrBackdrop: "POSTER" | "BACKDROP";
+  components: Array<any>;
   height: string | number;
   width: string | number;
 }
@@ -29,19 +24,7 @@ const ScrollableRow = (props: Props) => {
     ref.current?.scrollBy({ left: -800 });
   };
 
-  if (
-    props.moviesData &&
-    props.moviesData.movies &&
-    props.moviesData.movies.length == 0
-  ) {
-    return (
-      <Typography className="pl-32" variant="h6">
-        No {props.title} Available
-      </Typography>
-    );
-  }
-
-  if (props.tvShowsData && props.tvShowsData.tvShows.length == 0) {
+  if (props.components.length == 0) {
     return (
       <Typography className="pl-32" variant="h6">
         No {props.title} Available
@@ -64,7 +47,7 @@ const ScrollableRow = (props: Props) => {
             scrollSnapType: "x mandatory",
           }}
         >
-          {props.moviesData?.movies.length === 0 &&
+          {props.components.length === 0 &&
             [...Array(8)].map((_, i) => (
               <ScrollableRowSkeleton
                 key={i}
@@ -72,37 +55,7 @@ const ScrollableRow = (props: Props) => {
                 width={props.width}
               />
             ))}
-          {props.tvShowsData?.tvShows.length === 0 &&
-            [...Array(8)].map((_, i) => (
-              <ScrollableRowSkeleton
-                key={i}
-                height={props.height}
-                width={props.width}
-              />
-            ))}
-          {props.moviesData &&
-            props.moviesData.movies.length != 0 &&
-            props.moviesData.movies.map((data) => (
-              <ScrollableRowTile
-                posterOrBackdrop={props.posterOrBackdrop}
-                key={data.id}
-                height={props.height}
-                width={props.width}
-                movie={data}
-              ></ScrollableRowTile>
-            ))}
-          {props.tvShowsData &&
-            !props.moviesData &&
-            props.tvShowsData.tvShows.length != 0 &&
-            props.tvShowsData.tvShows.map((data) => (
-              <ScrollableRowTile
-                posterOrBackdrop={props.posterOrBackdrop}
-                key={data.id}
-                height={props.height}
-                width={props.width}
-                tvShow={data}
-              ></ScrollableRowTile>
-            ))}
+          {props.components.length != 0 && props.components}
         </Box>
         <IconButton
           className="absolute top-1/2"

@@ -9,6 +9,7 @@ import {
   detailedtvShowsType,
   fetchTvShowDetail,
 } from "../store/tv-shows-slice";
+import ScrollableRowTile from "../components/ScrollableRowTile";
 
 const TvShowDetailPage: React.FC = () => {
   const id = Number(useParams<{ id: string }>()["id"]);
@@ -143,22 +144,38 @@ const TvShowDetailPage: React.FC = () => {
         </Grid>
         <Grid item xs={8}>
           <Box className="flex w-[100%] flex-col gap-12 p-6">
-            {tvshow && tvshow.recommendations && (
+            {tvshow &&
+              tvshow.recommendations &&
+              tvshow.recommendations.length != 0 && (
+                <ScrollableRow
+                  title="Recomendations"
+                  components={tvshow.recommendations.map((data) => (
+                    <ScrollableRowTile
+                      posterOrBackdrop={"POSTER"}
+                      key={data.id}
+                      height={"18rem"}
+                      width={"12rem"}
+                      tvShow={data}
+                    ></ScrollableRowTile>
+                  ))}
+                  height={"18rem"}
+                  width={"12rem"}
+                />
+              )}
+            {tvshow && tvshow.similar && tvshow.similar.length != 0 && (
               <ScrollableRow
-                posterOrBackdrop="BACKDROP"
-                title="Recommendations"
-                height={"9rem"}
-                width={"16rem"}
-                tvShowsData={{ page: 0, tvShows: tvshow.recommendations }}
-              />
-            )}
-            {tvshow && tvshow.similar && (
-              <ScrollableRow
-                posterOrBackdrop="POSTER"
-                height={"15rem"}
-                width={"10rem"}
                 title="Similar"
-                tvShowsData={{ page: 0, tvShows: tvshow.similar }}
+                components={tvshow.similar.map((data) => (
+                  <ScrollableRowTile
+                    posterOrBackdrop={"POSTER"}
+                    key={data.id}
+                    height={"18rem"}
+                    width={"12rem"}
+                    tvShow={data}
+                  ></ScrollableRowTile>
+                ))}
+                height={"18rem"}
+                width={"12rem"}
               />
             )}
           </Box>

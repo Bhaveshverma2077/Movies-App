@@ -1,15 +1,16 @@
 import { useEffect } from "react";
-
-import { Box } from "@mui/material";
 import { useSelector } from "react-redux";
 
-import store, { RootState } from "../store";
-import Hero from "../components/Hero";
-import TopAppBar from "../components/TopAppBar";
-import ScrollableRow from "../components/ScrollableRow";
-import { fetchPopular as fetchPopularMovies } from "../store/movies-slice";
+import { Box } from "@mui/material";
 
+import Hero from "../components/Hero";
+import ScrollableRow from "../components/ScrollableRow";
+
+import store, { RootState } from "../store";
+
+import { fetchPopular as fetchPopularMovies } from "../store/movies-slice";
 import { fetchPopular as fetchPopularTvShows } from "../store/tv-shows-slice";
+import ScrollableRowTile from "../components/ScrollableRowTile";
 
 const HomePage: React.FC = () => {
   useEffect(() => {
@@ -34,20 +35,111 @@ const HomePage: React.FC = () => {
               toward his destiny in a turbulent world where people often prove
               more wicked than beasts."
         ></Hero>
+        {popularMoviesState && popularMoviesState.movies.length != 0 && (
+          <ScrollableRow
+            title="Featured Tv Shows"
+            components={popularMoviesState.movies.map((data) => (
+              <ScrollableRowTile
+                posterOrBackdrop={"POSTER"}
+                key={data.id}
+                height={"18rem"}
+                width={"12rem"}
+                movie={data}
+              ></ScrollableRowTile>
+            ))}
+            height={"18rem"}
+            width={"12rem"}
+          />
+        )}
+        {popularTvShowsState && popularTvShowsState.tvShows.length != 0 && (
+          <ScrollableRow
+            title="Featured Tv Shows"
+            components={popularTvShowsState.tvShows.map((data) => (
+              <ScrollableRowTile
+                posterOrBackdrop={"POSTER"}
+                key={data.id}
+                height={"18rem"}
+                width={"12rem"}
+                tvShow={data}
+              ></ScrollableRowTile>
+            ))}
+            height={"18rem"}
+            width={"12rem"}
+          />
+        )}
         <ScrollableRow
-          posterOrBackdrop="POSTER"
-          title="Featured Movies"
-          moviesData={popularMoviesState}
+          title="nice"
           height={"18rem"}
-          width={"12rem"}
-        />
-        <ScrollableRow
-          posterOrBackdrop="POSTER"
-          title="Featured Tv Shows"
-          tvShowsData={popularTvShowsState}
-          height={"18rem"}
-          width={"12rem"}
-        />
+          width={"32rem"}
+          components={[
+            <Box className="w-full">
+              <iframe
+                className="border-none"
+                width="560"
+                height="315"
+                src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
+                title="YouTube video player"
+                allow="encrypted-media; fullscreen;"
+              ></iframe>
+            </Box>,
+            <iframe
+              className="border-none"
+              width="560"
+              height="315"
+              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
+              title="YouTube video player"
+              allow="encrypted-media; fullscreen;"
+            ></iframe>,
+            <iframe
+              className="border-none"
+              width="560"
+              height="315"
+              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
+              title="YouTube video player"
+              allow="encrypted-media; fullscreen;"
+            ></iframe>,
+            <iframe
+              className="border-none"
+              width="560"
+              height="315"
+              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
+              title="YouTube video player"
+              allow="encrypted-media; fullscreen;"
+            ></iframe>,
+            <iframe
+              className="border-none"
+              width="560"
+              height="315"
+              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
+              title="YouTube video player"
+              allow="encrypted-media; fullscreen;"
+            ></iframe>,
+            <iframe
+              className="border-none"
+              width="560"
+              height="315"
+              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
+              title="YouTube video player"
+              allow="encrypted-media; fullscreen;"
+            ></iframe>,
+            <iframe
+              className="border-none"
+              width="560"
+              height="315"
+              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
+              title="YouTube video player"
+              allow="encrypted-media; fullscreen;"
+            ></iframe>,
+            <iframe
+              className="border-none"
+              width="560"
+              height="315"
+              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
+              title="YouTube video player"
+              allow="encrypted-media; fullscreen;"
+            ></iframe>,
+          ]}
+        ></ScrollableRow>
       </Box>
     </>
   );

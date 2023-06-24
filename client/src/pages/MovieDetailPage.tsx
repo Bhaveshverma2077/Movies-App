@@ -7,6 +7,7 @@ import ScrollableRow from "../components/ScrollableRow";
 import MovieDetailTable from "../components/MovieDetailTable";
 import { useNavigate, useParams } from "react-router-dom";
 import LoadingContent from "../components/LoadingContent";
+import ScrollableRowTile from "../components/ScrollableRowTile";
 
 const MovieOrTvShowDetilPage: React.FC = () => {
   const id = Number(useParams<{ id: string }>()["id"]);
@@ -32,8 +33,6 @@ const MovieOrTvShowDetilPage: React.FC = () => {
     setImageLoading(true);
   }, [id]);
   useEffect(() => {
-    console.log(status, movie?.posterPath, isImageLoading);
-
     if (status == "NOTLOADING" && !movie?.posterPath && isImageLoading) {
       setImageLoading(false);
     }
@@ -146,31 +145,55 @@ const MovieOrTvShowDetilPage: React.FC = () => {
             <Typography variant="h5" className="ml-8 md:ml-[8rem] pb-3">
               Videos
             </Typography>
-            <iframe
-              className="border-none"
-              width="560"
-              height="315"
-              src="https://www.youtube-nocookie.com/embed/qEVUtrk8_B4"
-              title="YouTube video player"
-              allow="encrypted-media; fullscreen;"
-            ></iframe>
+            {status == "NOTLOADING" && (
+              <iframe
+                className="border-none"
+                width="560"
+                height="315"
+                src={`https://www.youtube-nocookie.com/embed/${movie?.videos[0].key}`}
+                title="YouTube video player"
+                allow="encrypted-media; fullscreen;"
+              ></iframe>
+            )}
           </Box>
           {movie && movie.recommendations && (
             <ScrollableRow
-              posterOrBackdrop="BACKDROP"
               title="Recommendations"
-              height={"9rem"}
-              width={"16rem"}
-              moviesData={{ page: 0, movies: movie.recommendations }}
+              components={
+                movie && movie.recommendations.length != 0
+                  ? movie.recommendations.map((data) => (
+                      <ScrollableRowTile
+                        posterOrBackdrop={"POSTER"}
+                        key={data.id}
+                        height={"18rem"}
+                        width={"12rem"}
+                        movie={data}
+                      ></ScrollableRowTile>
+                    ))
+                  : []
+              }
+              height={"18rem"}
+              width={"12rem"}
             />
           )}
           {movie && movie.similar && (
             <ScrollableRow
-              posterOrBackdrop="POSTER"
-              height={"15rem"}
-              width={"10rem"}
               title="Similar"
-              moviesData={{ page: 0, movies: movie.similar }}
+              components={
+                movie && movie.similar.length != 0
+                  ? movie.similar.map((data) => (
+                      <ScrollableRowTile
+                        posterOrBackdrop={"POSTER"}
+                        key={data.id}
+                        height={"18rem"}
+                        width={"12rem"}
+                        movie={data}
+                      ></ScrollableRowTile>
+                    ))
+                  : []
+              }
+              height={"18rem"}
+              width={"12rem"}
             />
           )}
         </Box>
