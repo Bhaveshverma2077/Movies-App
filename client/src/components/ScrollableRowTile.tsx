@@ -58,7 +58,11 @@ const ScrollableRowTile: React.FC<Props> = (props) => {
     <Button
       disabled={isLoading}
       onClick={() => {
-        navigate(`/movie/${movieOrTvData.id}`);
+        if (props.movie) {
+          navigate(`/movie/${movieOrTvData.id}`);
+          return;
+        }
+        navigate(`/tv-show/${movieOrTvData.id}`);
       }}
       onMouseOver={() => {
         setIsHover(true);
