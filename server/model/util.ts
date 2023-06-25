@@ -56,6 +56,15 @@ type ApiMovieById = {
   genres: Array<{ id: number; name: "string" }>;
   homepage: string;
   id: number;
+  videos: {
+    results: Array<{
+      id: number;
+      type: string;
+      name: string;
+      site: string;
+      key: string;
+    }>;
+  };
   imdb_id: string;
   overview: string;
   poster_path: string;
@@ -115,4 +124,6 @@ export {
   ApiMovieById,
   ApiTvShowById,
   ApiWatchProviderData,
+  Movie,
+  TvShow,
 };

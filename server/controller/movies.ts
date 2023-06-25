@@ -3,9 +3,23 @@ import {
   ApiMovieById,
   ApiMovieData,
   ApiWatchProviderData,
+  Movie,
 } from "../model/util";
 
 // Helpers
+
+type moviesType = Array<{
+  adult: boolean;
+  genreIds: number[];
+  id: number;
+  title: string;
+  posterPath: string;
+  backdropPath: string;
+  overview: string;
+  releaseDate: string;
+  rating: number;
+  ratingCount: number;
+}>;
 
 const genresList = [
   {
@@ -175,6 +189,7 @@ const getTopRated = (req: Request, res: Response, next: NextFunction) => {
   if (req.query.page) {
     params = {
       page: req.query.page,
+      language: "en-US",
     };
   }
   moviesHelper("https://api.themoviedb.org/3/movie/top_rated", params)
@@ -191,8 +206,10 @@ const getPopular = (req: Request, res: Response, next: NextFunction) => {
   if (req.query.page) {
     params = {
       page: req.query.page,
+      language: "en-US",
     };
   }
+
   moviesHelper("https://api.themoviedb.org/3/movie/popular", params)
     .then((data) => {
       res.status(200).json(data);
@@ -207,6 +224,7 @@ const getUpcoming = (req: Request, res: Response, next: NextFunction) => {
   if (req.query.page) {
     params = {
       page: req.query.page,
+      language: "en-US",
     };
   }
   moviesHelper("https://api.themoviedb.org/3/movie/upcoming", params)
@@ -227,6 +245,7 @@ const getMoviesInTheatres = (
   if (req.query.page) {
     params = {
       page: req.query.page,
+      language: "en-US",
     };
   }
   moviesHelper("https://api.themoviedb.org/3/movie/now_playing", params)
@@ -299,86 +318,116 @@ const getMovieById = (req: Request, res: Response, next: NextFunction) => {
         },
       }
     ).then((res) => res.json()),
+    moviesHelper(
+      `https://api.themoviedb.org/3/movie/${req.params.id}/recommendations`
+    ),
+    moviesHelper(`https://api.themoviedb.org/3/movie/${req.params.id}/similar`),
   ])
-    .then((body: [ApiMovieById, ApiWatchProviderData]) => {
-      if (!body[1]?.results["IN"]) {
-        body[1].results["IN"] = { buy: [], flatrate: [] };
-      } else if (!body[1]?.results["IN"]?.flatrate) {
-        body[1].results["IN"].flatrate = [];
+    .then(
+      (body: [ApiMovieById, ApiWatchProviderData, moviesType, moviesType]) => {
+        if (!body[1]?.results["IN"]) {
+          body[1].results["IN"] = { buy: [], flatrate: [] };
+        } else if (!body[1]?.results["IN"]?.flatrate) {
+          body[1].results["IN"].flatrate = [];
+        }
+        const allProviders = [...body[1].results["IN"]?.flatrate];
+        const moviesWatchProvider = allProviders.map((provider) => ({
+          logoPath: provider.logo_path,
+          providerName: provider.provider_name,
+        }));
+
+        const outgoingData = {
+          adult: body[0].adult,
+          backdropPath: body[0].backdrop_path,
+          belongsToCollection: body[0].belongs_to_collection,
+          genres: body[0].genres,
+          moviesWatchProvider: moviesWatchProvider,
+          logoPath: body[0].images.logos[0]?.file_path,
+          homepage: body[0].homepage,
+          id: body[0].id,
+          imdbId: body[0].imdb_id,
+          videos: body[0].videos.results,
+          overview: body[0].overview,
+          posterPath: body[0].poster_path,
+          releaseDate: body[0].release_date,
+          runtime: body[0].runtime,
+          status: body[0].status,
+          title: body[0].title,
+          rating: body[0].vote_average,
+          ratingCount: body[0].vote_count,
+          recommendations: body[2],
+          similar: body[3],
+        };
+
+        res.status(200).send(outgoingData);
       }
-      const allProviders = [...body[1].results["IN"]?.flatrate];
-      const moviesWatchProvider = allProviders.map((provider) => ({
-        logoPath: provider.logo_path,
-        providerName: provider.provider_name,
-      }));
-
-      const outgoingData = {
-        adult: body[0].adult,
-        backdropPath: body[0].backdrop_path,
-        belongsToCollection: body[0].belongs_to_collection,
-        genres: body[0].genres,
-        moviesWatchProvider: moviesWatchProvider,
-        logoPath: body[0].images.logos[0]?.file_path,
-        homepage: body[0].homepage,
-        id: body[0].id,
-        imdbId: body[0].imdb_id,
-        overview: body[0].overview,
-        posterPath: body[0].poster_path,
-        releaseDate: body[0].release_date,
-        runtime: body[0].runtime,
-        status: body[0].status,
-        title: body[0].title,
-        rating: body[0].vote_average,
-        ratingCount: body[0].vote_count,
-      };
-
-      res.status(200).send(outgoingData);
-    })
+    )
     .catch((err) => {
       res.status(400).json({ err: "something went wrong" });
     });
 };
 
-const getSimilarById = (req: Request, res: Response, next: NextFunction) => {
-  let params: {} | null = null;
-  if (req.query.page) {
-    params = {
-      page: req.query.page,
-    };
-  }
-  moviesHelper(
-    `https://api.themoviedb.org/3/movie/${req.params.id}/similar`,
-    params
-  )
-    .then((data) => {
-      res.status(200).json(data);
-    })
-    .catch((err) => {
-      res.status(400).json({ err: "something went wrong" });
-    });
-};
-
-const getMovieRecommendationsById = (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  let params: {} | null = null;
-  if (req.query.page) {
-    params = {
-      page: req.query.page,
-    };
-  }
-  moviesHelper(
-    `https://api.themoviedb.org/3/movie/${req.params.id}/recommendations`,
-    params
-  )
-    .then((data) => {
-      res.status(200).json(data);
-    })
-    .catch((err) => {
-      res.status(400).json({ err: "something went wrong" });
-    });
+const getGenre = (req: Request, res: Response, next: NextFunction) => {
+  const genrePromiseList: Array<
+    Promise<{
+      genre: { id: number; name: string };
+      allGenreMovieLists: Array<Movie>;
+    }>
+  > = [];
+  genresList.map((genre) => {
+    genrePromiseList.push(
+      fetch(
+        `https://api.themoviedb.org/3/discover/movie?with_genres=${genre.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.API_KEY}`,
+          },
+        }
+      )
+        .then((res) => res.json())
+        .then((body: ApiMovieData) => {
+          console.log(body);
+          return { genre, allGenreMovieLists: body.results };
+        })
+    );
+  });
+  return Promise.all(genrePromiseList).then(
+    (
+      body: Array<{
+        genre: { id: number; name: string };
+        allGenreMovieLists: Array<Movie>;
+      }>
+    ) => {
+      const genreList: Array<{
+        genre: { id: number; name: string };
+        movie: Movie;
+      }> = [];
+      body.forEach((movieList) => {
+        movieList.allGenreMovieLists.every((movie) => {
+          let isInFlag = false;
+          genreList.every((genreMovie) => {
+            if (genreMovie.movie.id === movie.id) {
+              isInFlag = true;
+              return false;
+            }
+            return true;
+          });
+          if (!isInFlag) {
+            genreList.push({ genre: movieList.genre, movie });
+            return false;
+          }
+          return true;
+        });
+      });
+      res.status(200).json(
+        genreList.map((genreItem) => ({
+          genre: genreItem.genre,
+          backdrop: genreItem.movie.backdrop_path,
+        }))
+      );
+      return;
+    }
+  );
 };
 
 export default {
@@ -387,9 +436,8 @@ export default {
   getTopRated,
   getMoviesInTheatres,
   getUpcoming,
+  getGenre,
   getMovieById,
   getSearchMovie,
   getMoviesWithGenre,
-  getSimilarById,
-  getMovieRecommendationsById,
 };

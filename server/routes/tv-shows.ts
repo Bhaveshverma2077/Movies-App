@@ -19,12 +19,8 @@ router.route("/find/:id").get(tvShowsController.getTvShowById);
 
 router.route("/search/:searchString").get(tvShowsController.getSearchTvShow);
 
+router.route("/genres").get(tvShowsController.getGenre);
+
 router.route("/genres/:genre").get(tvShowsController.getTvShowsWithGenres);
-
-router.route("/similar/:id").get(tvShowsController.getSimilarById);
-
-router
-  .route("/recommendations/:id")
-  .get(tvShowsController.getTvShowsRecommendationsById);
 
 export default router;

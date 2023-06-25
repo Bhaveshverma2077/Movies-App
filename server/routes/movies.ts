@@ -17,12 +17,8 @@ router.route("/find/:id").get(moviesController.getMovieById);
 
 router.route("/search/:searchString").get(moviesController.getSearchMovie);
 
+router.route("/genres").get(moviesController.getGenre);
+
 router.route("/genres/:genre").get(moviesController.getMoviesWithGenre);
-
-router.route("/similar/:id").get(moviesController.getSimilarById);
-
-router
-  .route("/recommendations/:id")
-  .get(moviesController.getMovieRecommendationsById);
 
 export default router;
