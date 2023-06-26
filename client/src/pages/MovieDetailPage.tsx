@@ -8,13 +8,12 @@ import MovieDetailTable from "../components/MovieDetailTable";
 import { useNavigate, useParams } from "react-router-dom";
 import LoadingContent from "../components/LoadingContent";
 import ScrollableRowTile from "../components/ScrollableRowTile";
+import LoadingImagePoster from "../components/LoadingImagePoster";
 
 const MovieOrTvShowDetilPage: React.FC = () => {
   const id = Number(useParams<{ id: string }>()["id"]);
 
   const navigate = useNavigate();
-
-  const [isImageLoading, setImageLoading] = useState(false);
 
   const status = useSelector(
     (state: RootState) => state.movies.detailMovieStatus
@@ -30,23 +29,28 @@ const MovieOrTvShowDetilPage: React.FC = () => {
 
   useEffect(() => {
     store.dispatch(fetchMovieDetail(id));
-    setImageLoading(true);
+    // setImageLoading(true);
   }, [id]);
-  useEffect(() => {
-    if (status == "NOTLOADING" && !movie?.posterPath && isImageLoading) {
-      setImageLoading(false);
-    }
-  }, [status]);
 
   return (
     <Grid container>
-      <Grid item xs={8}>
-        <Box className="flex flex-col h-full justify-center gap-3 pl-[9.3rem] pr-6">
+      <Grid className="md:hidden" item xs={12}>
+        <LoadingImagePoster
+          key={id}
+          mediaPosterPath={movie?.posterPath}
+          status={status}
+        ></LoadingImagePoster>
+      </Grid>
+      <Grid item xs={12} md={8}>
+        <Box className="flex flex-col h-full justify-center gap-4 pl-6 lg:pl-36 mt-10 pr-6">
           {status == "LOADING" && <LoadingContent />}
           {status == "NOTLOADING" && (
             <>
-              {" "}
-              <Typography className="text-5xl lg:text-6xl" component="h1">
+              <Typography
+                className="text-5xl lg:text-6xl font-bold"
+                // variant="subtitle2"
+                component="h1"
+              >
                 {movie?.title}
               </Typography>
               <Box className="flex gap-2 items-center">
@@ -56,12 +60,12 @@ const MovieOrTvShowDetilPage: React.FC = () => {
                   precision={0.25}
                   readOnly
                 />
-                <Typography variant="subtitle2">
-                  ({movie?.ratingCount})
+                <Typography className="text-lg lg:text-xl" component="h3">
+                  {movie?.ratingCount}
                 </Typography>
               </Box>
               <Typography
-                className="text-zinc-400"
+                className="text-sm lg:text-base  text-zinc-400"
                 variant="subtitle1"
                 component="h2"
               >
@@ -110,95 +114,76 @@ const MovieOrTvShowDetilPage: React.FC = () => {
           )}
         </Box>
       </Grid>
-      <Grid item xs={4}>
-        {(status == "LOADING" || isImageLoading) && (
-          <Box className="w-full mb-12 p-4" sx={{ aspectRatio: "2 / 3" }}>
-            <Skeleton
-              sx={{ transform: "none" }}
-              className="w-full h-full"
-              component={"div"}
-            ></Skeleton>
-          </Box>
-        )}
-        {status == "NOTLOADING" && !movie?.posterPath && (
-          <Box
-            className={`w-full h-full flex items-center justify-center bg-zinc-800 text-zinc-200`}
-          >
-            <Typography className="my-auto" variant="subtitle1">
-              Preview Not Available
-            </Typography>
-          </Box>
-        )}
-        {movie?.posterPath && (
-          <img
-            className={`w-full mb-12 ${isImageLoading ? "hidden" : ""}`}
-            src={`https://image.tmdb.org/t/p/w780/${movie?.posterPath}`}
-            alt=""
-            onLoad={() => setImageLoading(false)}
-            onError={() => setImageLoading(false)}
-          />
-        )}
+      <Grid className="hidden md:block" item xs={4}>
+        <LoadingImagePoster
+          key={id}
+          mediaPosterPath={movie?.posterPath}
+          status={status}
+        ></LoadingImagePoster>
       </Grid>
-      <Grid item xs={8}>
-        <Box className="flex w-[100%] flex-col gap-12 p-6">
+      <Grid item xs={12} md={8}>
+        <Box className="flex w-[100%] mt-16 flex-col gap-12 md:px-6">
           <Box className="flex flex-col justify-center w-full">
-            <Typography variant="h5" className="ml-8 md:ml-[8rem] pb-3">
-              Videos
-            </Typography>
-            {status == "NOTLOADING" && (
-              <iframe
-                className="border-none"
-                width="560"
-                height="315"
-                src={`https://www.youtube-nocookie.com/embed/${movie?.videos[0].key}`}
-                title="YouTube video player"
-                allow="encrypted-media; fullscreen;"
-              ></iframe>
+            {status == "NOTLOADING" && movie && (
+              <ScrollableRow
+                title="Videos"
+                height={"18rem"}
+                width={"32rem"}
+                components={movie!.videos.map((video) => (
+                  <Box
+                    key={video.key}
+                    sx={{
+                      scrollSnapAlign: "center",
+                    }}
+                  >
+                    <iframe
+                      className="border-none w-[100vw] h-[56vw] md:w-[60vw] md:h-[34vw] max-w-[36rem] max-h-[20rem]"
+                      src={`https://www.youtube-nocookie.com/embed/${video.key}`}
+                      title="YouTube video player"
+                      allow="encrypted-media; fullscreen;"
+                    ></iframe>
+                  </Box>
+                ))}
+              ></ScrollableRow>
             )}
           </Box>
-          {movie && movie.recommendations && (
-            <ScrollableRow
-              title="Recommendations"
-              components={
-                movie && movie.recommendations.length != 0
-                  ? movie.recommendations.map((data) => (
-                      <ScrollableRowTile
-                        posterOrBackdrop={"POSTER"}
-                        key={data.id}
-                        height={"18rem"}
-                        width={"12rem"}
-                        movie={data}
-                      ></ScrollableRowTile>
-                    ))
-                  : []
-              }
-              height={"18rem"}
-              width={"12rem"}
-            />
-          )}
-          {movie && movie.similar && (
+          {movie &&
+            movie.recommendations &&
+            movie.recommendations.length != 0 && (
+              <ScrollableRow
+                title="Recommendations"
+                components={movie.recommendations.map((data) => (
+                  <ScrollableRowTile
+                    posterOrBackdrop={"POSTER"}
+                    key={data.id}
+                    height={"18rem"}
+                    width={"12rem"}
+                    movie={data}
+                  ></ScrollableRowTile>
+                ))}
+                height={"18rem"}
+                width={"12rem"}
+              />
+            )}
+          {movie && movie.similar && movie.similar.length != 0 && (
             <ScrollableRow
               title="Similar"
-              components={
-                movie && movie.similar.length != 0
-                  ? movie.similar.map((data) => (
-                      <ScrollableRowTile
-                        posterOrBackdrop={"POSTER"}
-                        key={data.id}
-                        height={"18rem"}
-                        width={"12rem"}
-                        movie={data}
-                      ></ScrollableRowTile>
-                    ))
-                  : []
-              }
+              components={movie.similar.map((data) => (
+                <ScrollableRowTile
+                  posterOrBackdrop={"POSTER"}
+                  key={data.id}
+                  height={"18rem"}
+                  width={"12rem"}
+                  movie={data}
+                ></ScrollableRowTile>
+              ))}
               height={"18rem"}
               width={"12rem"}
             />
           )}
         </Box>
       </Grid>
-      <Grid item xs={4}>
+      <Grid item xs={12} md={4}>
         <MovieDetailTable movie={movie}></MovieDetailTable>
       </Grid>
     </Grid>
