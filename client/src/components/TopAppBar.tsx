@@ -10,11 +10,14 @@ import {
   Tooltip,
   Slide,
   useScrollTrigger,
+  LinearProgress,
 } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
 import React, { useState } from "react";
 import { Link as LinkReactRouter, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../store";
 
 const pages = [
   { title: "Movies", path: "/movie" },
@@ -26,6 +29,10 @@ const pages = [
 const settings = ["Profile", "Account", "Logout"];
 
 const TopAppBar = () => {
+  const isLoading = useSelector(
+    (state: RootState) => state.others.appBarLoading
+  );
+
   const navigate = useNavigate();
 
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
@@ -104,6 +111,7 @@ const TopAppBar = () => {
             </Tooltip>
             <Menu
               open={!!anchorElUser}
+              className="bg-transparent"
               anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
               transformOrigin={{ vertical: "top", horizontal: "right" }}
               anchorEl={anchorElUser}
@@ -117,6 +125,7 @@ const TopAppBar = () => {
             </Menu>
           </Box>
         </Toolbar>
+        {isLoading && <LinearProgress />}
       </AppBar>
     </Slide>
   );
