@@ -29,6 +29,7 @@ import PaddingTopWrapper from "./components/PaddingTopWrapper";
 
 import store from "./store";
 import TvShowDetailPage from "./pages/TvShowDetailPage";
+import { useState } from "react";
 
 function App() {
   const params = useParams();
@@ -39,6 +40,7 @@ function App() {
       fontFamily: "Lato, sans-serif",
       fontWeightBold: 700,
     },
+
     breakpoints: {
       values: {
         xs: 0,
@@ -46,6 +48,13 @@ function App() {
         md: 768,
         lg: 1024,
         xl: 1536,
+      },
+    },
+    components: {
+      MuiMenu: {
+        styleOverrides: {
+          // paper: { backgroundColor: "rgba(0, 0, 0, 0.3)" },
+        },
       },
     },
   });
@@ -76,7 +85,7 @@ function App() {
                 {
                   path: "",
                   element: (
-                    <PaddingTopWrapper pt={8}>
+                    <PaddingTopWrapper pt={6}>
                       <GenrePage />
                     </PaddingTopWrapper>
                   ),
@@ -94,7 +103,14 @@ function App() {
                   <SearchPage />
                 </PaddingTopWrapper>
               ),
-              children: [{ path: ":searchString" }],
+            },
+            {
+              path: "search/:searchString",
+              element: (
+                <PaddingTopWrapper pt={10}>
+                  <SearchPage />
+                </PaddingTopWrapper>
+              ),
             },
           ],
         },
@@ -109,7 +125,14 @@ function App() {
                   <SearchPage />
                 </PaddingTopWrapper>
               ),
-              children: [{ path: ":searchString" }],
+            },
+            {
+              path: "search/:searchString",
+              element: (
+                <PaddingTopWrapper pt={10}>
+                  <SearchPage />
+                </PaddingTopWrapper>
+              ),
             },
             {
               path: "genre",
@@ -126,7 +149,7 @@ function App() {
                 {
                   path: "",
                   element: (
-                    <PaddingTopWrapper pt={8}>
+                    <PaddingTopWrapper pt={6}>
                       <GenrePage />
                     </PaddingTopWrapper>
                   ),
