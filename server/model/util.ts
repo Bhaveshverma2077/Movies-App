@@ -86,6 +86,15 @@ type ApiTvShowById = {
   id: number;
   overview: string;
   poster_path: string;
+  videos: {
+    results: Array<{
+      id: number;
+      type: string;
+      name: string;
+      site: string;
+      key: string;
+    }>;
+  };
   first_air_date: string;
   last_air_date: string;
   number_of_episodes: number;

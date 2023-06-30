@@ -325,13 +325,16 @@ const getMovieById = (req: Request, res: Response, next: NextFunction) => {
   ])
     .then(
       (body: [ApiMovieById, ApiWatchProviderData, moviesType, moviesType]) => {
-        if (!body[1]?.results["IN"]) {
-          body[1].results["IN"] = { buy: [], flatrate: [] };
-        } else if (!body[1]?.results["IN"]?.flatrate) {
-          body[1].results["IN"].flatrate = [];
+        let allProviders: Array<any> = [];
+
+        if (body[1] && body[1].results && body[1].results["US"]) {
+          if (body[1].results["US"].flatrate)
+            allProviders = [...body[1].results["US"].flatrate];
+          if (body[1].results["US"].buy)
+            allProviders = [...allProviders, ...body[1].results["US"].buy];
         }
-        const allProviders = [...body[1].results["IN"]?.flatrate];
-        const moviesWatchProvider = allProviders.map((provider) => ({
+
+        const watchProviders = allProviders.map((provider) => ({
           logoPath: provider.logo_path,
           providerName: provider.provider_name,
         }));
@@ -341,7 +344,7 @@ const getMovieById = (req: Request, res: Response, next: NextFunction) => {
           backdropPath: body[0].backdrop_path,
           belongsToCollection: body[0].belongs_to_collection,
           genres: body[0].genres,
-          moviesWatchProvider: moviesWatchProvider,
+          watchProvider: watchProviders.slice(0, 10),
           logoPath: body[0].images.logos[0]?.file_path,
           homepage: body[0].homepage,
           id: body[0].id,
@@ -385,10 +388,10 @@ const getGenre = (req: Request, res: Response, next: NextFunction) => {
         }
       )
         .then((res) => res.json())
-        .then((body: ApiMovieData) => {
-          console.log(body);
-          return { genre, allGenreMovieLists: body.results };
-        })
+        .then((body: ApiMovieData) => ({
+          genre,
+          allGenreMovieLists: body.results,
+        }))
     );
   });
   return Promise.all(genrePromiseList).then(
@@ -406,7 +409,7 @@ const getGenre = (req: Request, res: Response, next: NextFunction) => {
         movieList.allGenreMovieLists.every((movie) => {
           let isInFlag = false;
           genreList.every((genreMovie) => {
-            if (genreMovie.movie.id === movie.id) {
+            if (genreMovie.movie.id === movie.id || !movie.backdrop_path) {
               isInFlag = true;
               return false;
             }

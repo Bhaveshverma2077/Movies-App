@@ -186,18 +186,11 @@ const getOnNetflix = (req: Request, res: Response, next: NextFunction) => {
       with_watch_providers: "8",
     };
   }
-
-  console.log(params);
-
   tvShowsHelper("https://api.themoviedb.org/3/discover/tv", params)
     .then((data) => {
-      console.log(data);
-
       res.status(200).json(data);
     })
     .catch((err) => {
-      console.log(err);
-
       res.status(400).json({ err: "something went wrong" });
     });
 };
@@ -283,19 +276,19 @@ const getTvShowById = (req: Request, res: Response, next: NextFunction) => {
           Array<tvShowType>
         ]
       ) => {
-        console.log("xx");
+        let allProviders: Array<any> = [];
 
-        // if (!body[1]?.results["IN"]) {
-        //   body[1].results["IN"] = { buy: [], flatrate: [] };
-        // } else if (!body[1]?.results["IN"]?.flatrate) {
-        //   body[1].results["IN"].flatrate = [];
-        // }
-        // const allProviders = [...body[1].results["IN"]?.flatrate];
-        // console.log(allProviders);
-        // const tvShowWatchProvider = allProviders.map((provider) => ({
-        //   logoPath: provider.logo_path,
-        //   providerName: provider.provider_name,
-        // }));
+        if (body[1] && body[1].results && body[1].results["US"]) {
+          if (body[1].results["US"].flatrate)
+            allProviders = [...body[1].results["US"].flatrate];
+          if (body[1].results["US"].buy)
+            allProviders = [...allProviders, ...body[1].results["US"].buy];
+        }
+
+        const watchProvider = allProviders.map((provider) => ({
+          logoPath: provider.logo_path,
+          providerName: provider.provider_name,
+        }));
 
         const outgoingData = {
           adult: body[0].adult,
@@ -304,7 +297,8 @@ const getTvShowById = (req: Request, res: Response, next: NextFunction) => {
           homepage: body[0].homepage,
           logoPath: body[0].images.logos[0]?.file_path,
           id: body[0].id,
-          tvShowWatchProvider: [],
+          watchProvider: watchProvider,
+          videos: body[0].videos.results,
           overview: body[0].overview,
           posterPath: body[0].poster_path,
           status: body[0].status,
@@ -382,7 +376,6 @@ const getGenre = (req: Request, res: Response, next: NextFunction) => {
       )
         .then((res) => res.json())
         .then((body: ApiTvShowData) => {
-          console.log(body);
           return { genre, allGenreMovieLists: body.results };
         })
     );
@@ -402,7 +395,7 @@ const getGenre = (req: Request, res: Response, next: NextFunction) => {
         movieList.allGenreMovieLists.every((movie) => {
           let isInFlag = false;
           genreList.every((genreMovie) => {
-            if (genreMovie.movie.id === movie.id) {
+            if (genreMovie.movie.id === movie.id || !movie.backdrop_path) {
               isInFlag = true;
               return false;
             }
