@@ -1,18 +1,24 @@
-import { Box, Button, Typography } from "@mui/material";
-import { moviesType } from "../store/movies-slice";
 import { useNavigate } from "react-router-dom";
 
+import LoadingGenreImage from "./LoadingGenreImage";
+
+import { Button, Typography } from "@mui/material";
+
+import { genreType } from "../store/movies-slice";
+
 const GenreItem: React.FC<{
-  genre: { id: number; name: string };
-  movie: moviesType;
+  genre: genreType;
+  mediaType: "MOVIE" | "TVSHOW";
+  backdrop: string;
 }> = (props) => {
   const navigate = useNavigate();
+
   return (
     <Button
       onClick={() => {
-        console.log(props.genre.name);
-
-        navigate(`/movie/genre/${props.genre.name.toLowerCase()}`);
+        if (props.mediaType == "MOVIE")
+          return navigate(`/movie/genre/${props.genre.name.toLowerCase()}`);
+        return navigate(`/tv-show/genre/${props.genre.name.toLowerCase()}`);
       }}
       className={`transition-transform text-zinc-200 p-0 relative w-full`}
       sx={{
@@ -31,13 +37,7 @@ const GenreItem: React.FC<{
       >
         {props.genre.name}
       </Typography>
-      <Box className="bg-zinc-800 transition-opacity">
-        <img
-          className="w-full block"
-          src={`https://image.tmdb.org/t/p/w500${props.movie.backdropPath}`}
-          alt=""
-        />
-      </Box>
+      <LoadingGenreImage backdrop={props.backdrop} />
     </Button>
   );
 };
