@@ -1,73 +1,37 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { type } from "os";
 import { RootState } from ".";
+import {
+  detailedtvShowsType,
+  genresList,
+  tvShowGenreType,
+  tvShowsStateType,
+  tvShowsType,
+} from "../app-data";
 
-const apiUrl = "192.168.1.7:9000";
+type genreType = { id: number; name: string };
 
-type detailedtvShowsType = {
-  adult: boolean;
-  backdropPath: string;
-  genres: Array<{ id: number; name: "string" }>;
-  homepage: string;
-  id: number;
-  overview: string;
-  logoPath: string;
-  posterPath: string;
-  firstAirDate: string;
-  lastAirDate: string;
-  numberOfEpisodes: number;
-  status: string;
-  seasons: Array<{
-    season_number: number;
-    episode_count: number;
-    id: number;
-    name: string;
-    poster_path: string;
-  }>;
-  name: string;
-  rating: number;
-  ratingCount: number;
-};
-
-type tvShowsType = {
-  adult: boolean;
-  genreIds: Array<number>;
-  id: number;
-  name: string;
-  posterPath: string;
-  backdropPath: string;
-  overview: string;
-  firstAirDate: string;
-  rating: number;
-  ratingCount: number;
-};
-
-type tvShowsStateType = { page: number; tvShows: Array<tvShowsType> };
-type genresType = {
-  genre: string;
-  id: number;
-  page: number;
-  tvShows: Array<tvShowsType>;
-}[];
+const apiUrl = "localhost:9000";
 
 type tvShowsInitialSateType = {
   discover: tvShowsStateType;
-  genres: genresType;
+  genres: tvShowGenreType;
   popular: tvShowsStateType;
   detailTvShows: Array<detailedtvShowsType>;
   airingToday: tvShowsStateType;
   onTheAir: tvShowsStateType;
   onNetflix: tvShowsStateType;
-
+  genrePageTvShows: Array<{ genre: genreType; backdrop: string }>;
+  detailTvShowStatus: "NOTLOADING" | "LOADING" | "ERROR";
   topRated: tvShowsStateType;
 };
 
 const tvShowsInitialSate: tvShowsInitialSateType = {
+  detailTvShowStatus: "NOTLOADING",
   airingToday: { page: 0, tvShows: [] },
   popular: { page: 0, tvShows: [] },
   discover: { page: 0, tvShows: [] },
   onNetflix: { page: 0, tvShows: [] },
-
+  genrePageTvShows: [],
   detailTvShows: [],
   genres: [],
   onTheAir: { page: 0, tvShows: [] },
@@ -79,7 +43,10 @@ const fetchPopular = createAsyncThunk<
   undefined,
   { state: RootState }
 >("tvshows/update-popular", async (_, thunkApi) => {
-  return fetch(`http://${apiUrl}/tv-shows/popular`)
+  const state = thunkApi.getState();
+  return fetch(
+    `http://${apiUrl}/tv-shows/popular?page=${state.tvs.popular.page + 1}`
+  )
     .then((res) => res.json())
     .then((body) => {
       return body;
@@ -91,7 +58,10 @@ const fetchTopRated = createAsyncThunk<
   undefined,
   { state: RootState }
 >("tvshows/update-top-rated", async (_, thunkApi) => {
-  return fetch(`http://${apiUrl}/tv-shows/top-rated`)
+  const state = thunkApi.getState();
+  return fetch(
+    `http://${apiUrl}/tv-shows/top-rated?page=${state.tvs.topRated.page + 1}`
+  )
     .then((res) => res.json())
     .then((body) => {
       return body;
@@ -136,7 +106,7 @@ const fetchOnNetflix = createAsyncThunk<
   const state = thunkApi.getState();
 
   return fetch(
-    `http://${apiUrl}/tv-shows/on-netflix?page=${state.tvs.onTheAir.page + 1}`
+    `http://${apiUrl}/tv-shows/on-netflix?page=${state.tvs.onNetflix.page + 1}`
   )
     .then((res) => res.json())
     .then((body: Array<tvShowsType>) => body);
@@ -147,15 +117,43 @@ const fetchTvShowDetail = createAsyncThunk<
   number,
   { state: RootState }
 >("tvshows/update-tv-show-detail", async (id) => {
-  console.log(id);
-
   return fetch(`http://${apiUrl}/tv-shows/find/${id}`)
     .then((res) => {
       return res.json();
     })
     .then((body: detailedtvShowsType) => {
-      console.log(body);
-      // store.dispatch(fetchRecommendedAndSimilar(id));
+      return body;
+    });
+});
+
+const fetchGenreItems = createAsyncThunk<
+  { genre: genreType; data: Array<tvShowsType> },
+  string,
+  { state: RootState }
+>("tvshows/update-genre-items", async (genreName) => {
+  const genre = genresList.find(
+    (genre) => genre.name.toLowerCase() == genreName
+  );
+
+  return fetch(`http://${apiUrl}/tv-shows/genres/${genreName}`)
+    .then((res) => {
+      return res.json();
+    })
+    .then((body: Array<tvShowsType>) => {
+      console.log({ genreName: genreName, data: body });
+
+      return { genre: genre!, data: body };
+    });
+});
+
+const fetchGenre = createAsyncThunk<
+  Array<{ genre: genreType; backdrop: string }>,
+  undefined,
+  { state: RootState }
+>("tvshows/update-genre", async () => {
+  return fetch(`http://${apiUrl}/tv-shows/genres`)
+    .then((res) => res.json())
+    .then((body: Array<{ genre: genreType; backdrop: string }>) => {
       return body;
     });
 });
@@ -193,8 +191,38 @@ const tvShowsSlice = createSlice({
       state.onNetflix.tvShows = [...state.onNetflix.tvShows, ...action.payload];
       return state;
     });
+    builder.addCase(fetchTvShowDetail.pending, (state, action) => {
+      state.detailTvShowStatus = "LOADING";
+      return state;
+    });
+    builder.addCase(fetchTvShowDetail.rejected, (state, action) => {
+      state.detailTvShowStatus = "ERROR";
+      return state;
+    });
     builder.addCase(fetchTvShowDetail.fulfilled, (state, action) => {
       state.detailTvShows.push(action.payload);
+      state.detailTvShowStatus = "NOTLOADING";
+      return state;
+    });
+    builder.addCase(fetchGenre.fulfilled, (state, action) => {
+      state.genrePageTvShows = action.payload;
+      return state;
+    });
+
+    builder.addCase(fetchGenreItems.fulfilled, (state, action) => {
+      const genre = state.genres.find(
+        (val) => val.genreName.toLowerCase() == action.payload.genre.name
+      );
+      if (!genre) {
+        state.genres.push({
+          genreName: action.payload.genre.name,
+          page: 0,
+          id: action.payload.genre.id,
+          tvShows: action.payload.data,
+        });
+        return state;
+      }
+      genre!.tvShows = [...genre!.tvShows, ...action.payload.data];
       return state;
     });
   },
@@ -202,13 +230,14 @@ const tvShowsSlice = createSlice({
 
 const tvShowsActions = tvShowsSlice.actions;
 
-export type { tvShowsStateType, tvShowsType };
-
 export {
+  genresList,
   tvShowsActions,
   fetchPopular,
+  fetchGenre,
   fetchTopRated,
   fetchOnNetflix,
+  fetchGenreItems,
   fetchAiringToday,
   fetchOnTheAir,
   fetchTvShowDetail,
