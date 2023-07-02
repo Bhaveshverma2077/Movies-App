@@ -10,10 +10,15 @@ import {
   TextField,
 } from "@mui/material";
 
-import OneGenreItem from "../components/OneGenreItem";
+import MediaTile from "../components/MediaTile";
 
-import { moviesType } from "../store/movies-slice";
-import { tvShowsType } from "../store/tv-shows-slice";
+import store from "../store";
+
+import { othersActions } from "../store/other-slice";
+
+import { SERVER_URL } from "../settings";
+import { tvShowsType } from "../app-data";
+import { moviesType } from "../app-data";
 
 const SearchPage: React.FC = () => {
   const route = useLocation().pathname;
@@ -25,26 +30,32 @@ const SearchPage: React.FC = () => {
     routeParams.searchString ?? ""
   );
   const [isLoading, setIsLoading] = useState(false);
-  const [movieOrTvShow, setMovieOrTvShow] = useState<"movie" | "tv-show">(
-    route.startsWith("/movie") ? "movie" : "tv-show"
+  const [mediaType, setMediaType] = useState<"MOVIE" | "TVSHOW">(
+    route.startsWith("/movie") ? "MOVIE" : "TVSHOW"
   );
   const [searchMovies, setSearchMovies] = useState<Array<moviesType>>([]);
   const [searchTvShows, setSearchTvShows] = useState<Array<tvShowsType>>([]);
 
   useEffect(() => {
     let timer = setTimeout(() => {
-      navigate(`/${movieOrTvShow}/search/${searchString}`);
+      navigate(
+        `/${mediaType == "MOVIE" ? "movie" : "tv-show"}/search/${searchString}`
+      );
       if (searchString == "") {
         return;
       }
       setIsLoading(true);
 
-      fetch(`http://localhost:9000/${movieOrTvShow}s/search/${searchString}`)
+      fetch(
+        `http://${SERVER_URL}/${
+          mediaType == "MOVIE" ? "movie" : "tv-show"
+        }s/search/${searchString}`
+      )
         .then((res) => {
           return res.json();
         })
         .then((body: Array<moviesType | tvShowsType>) => {
-          if (movieOrTvShow == "movie") {
+          if (mediaType == "MOVIE") {
             setSearchMovies(body as Array<moviesType>);
             setIsLoading(false);
             return;
@@ -59,29 +70,33 @@ const SearchPage: React.FC = () => {
     };
   }, [searchString]);
 
+  useEffect(() => {
+    store.dispatch(othersActions.changeAppBarLoading(isLoading));
+  }, [isLoading]);
+
   return (
-    <Box className="flex flex-col w-full items-center gap-12 px-8 lg:px-36">
-      <Box className="flex gap-2">
+    <Box className="flex flex-col w-full items-center px-8 lg:px-36">
+      <Box className="flex gap-2 pb-6">
         <Chip
           label="Movies"
-          variant={movieOrTvShow == "movie" ? "filled" : "outlined"}
+          variant={mediaType == "MOVIE" ? "filled" : "outlined"}
           onClick={() => {
-            setMovieOrTvShow("movie");
+            setMediaType("MOVIE");
             setSearchString("");
           }}
           clickable
         />
         <Chip
           label="Tv Shows"
-          variant={movieOrTvShow == "movie" ? "outlined" : "filled"}
+          variant={mediaType == "MOVIE" ? "outlined" : "filled"}
           onClick={() => {
             setSearchString("");
-            setMovieOrTvShow("tv-show");
+            setMediaType("TVSHOW");
           }}
           clickable
         />
       </Box>
-      <Box className="flex w-full lg:w-[50%]">
+      <Box className="flex w-full lg:w-[50%] pb-12">
         <Autocomplete
           freeSolo
           className="w-full"
@@ -91,9 +106,23 @@ const SearchPage: React.FC = () => {
             return setSearchString(newValue);
           }}
           options={
-            movieOrTvShow == "movie"
-              ? searchMovies.map((movie) => movie.title)
-              : searchTvShows.map((tvShow) => tvShow.name)
+            mediaType == "MOVIE"
+              ? searchMovies.reduce((movieArray: string[], movie) => {
+                  if (
+                    !movieArray.find((movieName) => movieName == movie.title)
+                  ) {
+                    movieArray.push(movie.title.trim());
+                  }
+                  return movieArray;
+                }, [])
+              : searchTvShows.reduce((tvShowArray: string[], tvshow) => {
+                  if (
+                    !tvShowArray.find((tvShowName) => tvShowName == tvshow.name)
+                  ) {
+                    tvShowArray.push(tvshow.name.trim());
+                  }
+                  return tvShowArray;
+                }, [])
           }
           renderInput={(params) => (
             <TextField
@@ -107,25 +136,38 @@ const SearchPage: React.FC = () => {
                   </>
                 ),
               }}
-              label={movieOrTvShow == "movie" ? "Movie" : "Tv Show"}
+              label={mediaType == "MOVIE" ? "Movie" : "Tv Show"}
             />
           )}
         />
       </Box>
-
       <Grid container>
-        {movieOrTvShow == "movie" &&
-          searchMovies.map((movie) => (
-            <Grid key={movie.id} item xs={4} md={3} lg={2}>
-              <OneGenreItem genre={{}} movie={movie} />
-            </Grid>
-          ))}
-        {movieOrTvShow == "tv-show" &&
-          searchTvShows.map((tvShow) => (
-            <Grid key={tvShow.id} item xs={4} md={3} lg={2}>
-              <OneGenreItem genre={{}} tvShow={tvShow} />
-            </Grid>
-          ))}
+        {mediaType == "MOVIE" &&
+          searchMovies
+            .filter((movie) => !!movie.posterPath)
+            .map((movie) => {
+              return (
+                <Grid key={movie.id} item xs={4} md={3} lg={2}>
+                  <MediaTile
+                    id={movie.id}
+                    posterPath={movie.posterPath}
+                    mediaType={mediaType}
+                  />
+                </Grid>
+              );
+            })}
+        {mediaType == "TVSHOW" &&
+          searchTvShows
+            .filter((tvshow) => !!tvshow.posterPath)
+            .map((tvshow) => (
+              <Grid key={tvshow.id} item xs={4} md={3} lg={2}>
+                <MediaTile
+                  id={tvshow.id}
+                  posterPath={tvshow.posterPath}
+                  mediaType={mediaType}
+                />
+              </Grid>
+            ))}
       </Grid>
     </Box>
   );
