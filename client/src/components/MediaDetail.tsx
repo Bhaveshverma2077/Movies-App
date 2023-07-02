@@ -7,8 +7,9 @@ import MovieDetailTable from "../components/MovieDetailTable";
 import LoadingContent from "../components/LoadingContent";
 import ScrollableRowTile from "../components/ScrollableRowTile";
 import LoadingImagePoster from "../components/LoadingImagePoster";
-import { detailedMoviesType, moviesType } from "../store/movies-slice";
-import { detailedtvShowsType, tvShowsType } from "../store/tv-shows-slice";
+
+import { detailedMoviesType, moviesType } from "../app-data";
+import { detailedtvShowsType, tvShowsType } from "../app-data";
 
 type Props = {
   status: "NOTLOADING" | "LOADING" | "ERROR";

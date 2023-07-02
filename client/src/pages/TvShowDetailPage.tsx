@@ -1,16 +1,14 @@
-import { Box, Button, Grid, Rating, Skeleton, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import store, { RootState } from "../store";
-import ScrollableRow from "../components/ScrollableRow";
 import { useNavigate, useParams } from "react-router-dom";
-import LoadingContent from "../components/LoadingContent";
-import {
-  detailedtvShowsType,
-  fetchTvShowDetail,
-} from "../store/tv-shows-slice";
-import ScrollableRowTile from "../components/ScrollableRowTile";
+import { useSelector } from "react-redux";
+
 import MediaDetail from "../components/MediaDetail";
+
+import store, { RootState } from "../store";
+
+import { fetchTvShowDetail } from "../store/tv-shows-slice";
+
+import { detailedtvShowsType } from "../app-data";
 
 const TvShowDetailPage: React.FC = () => {
   const id = Number(useParams<{ id: string }>()["id"]);
