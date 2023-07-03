@@ -18,29 +18,25 @@ import "./App.css";
 import Layout from "./pages/Layout";
 import AuthPage from "./pages/AuthPage";
 import HomePage from "./pages/HomePage";
+import TvShowDetailPage from "./pages/TvShowDetailPage";
 import GenrePage from "./pages/GenrePage";
 import MoviesPage from "./pages/MoviesPage";
 import SearchPage from "./pages/SearchPage";
 import MovieDetailPage from "./pages/MovieDetailPage";
-import OneGenrePage from "./pages/OneGenrePage";
+import MediaGridPage from "./pages/MediaGridPage";
 import TvShowsPage from "./pages/TvShowsPage";
 
 import PaddingTopWrapper from "./components/PaddingTopWrapper";
 
 import store from "./store";
-import TvShowDetailPage from "./pages/TvShowDetailPage";
-import { useState } from "react";
 
 function App() {
-  const params = useParams();
-
   const theme = createTheme({
     palette: { mode: "dark", primary: { main: "#E50914" } },
     typography: {
       fontFamily: "Lato, sans-serif",
       fontWeightBold: 700,
     },
-
     breakpoints: {
       values: {
         xs: 0,
@@ -78,7 +74,7 @@ function App() {
                   element: (
                     // PaddingTopWrapper: gives top padding to pages because of AppBar absolute positioning
                     <PaddingTopWrapper pt={4}>
-                      <OneGenrePage />
+                      <MediaGridPage />
                     </PaddingTopWrapper>
                   ),
                 },
@@ -142,7 +138,7 @@ function App() {
                   element: (
                     // PaddingTopWrapper: gives top padding to pages because of AppBar absolute positioning
                     <PaddingTopWrapper pt={4}>
-                      <OneGenrePage />
+                      <MediaGridPage />
                     </PaddingTopWrapper>
                   ),
                 },
@@ -170,7 +166,7 @@ function App() {
       <CssBaseline>
         <StyledEngineProvider injectFirst>
           <Provider store={store}>
-            {<RouterProvider router={router} />}
+            <RouterProvider router={router} />
           </Provider>
         </StyledEngineProvider>
       </CssBaseline>

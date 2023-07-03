@@ -9,15 +9,14 @@ import { Grid, Box, Chip, Skeleton } from "@mui/material";
 import store, { RootState } from "../store";
 import { fetchGenre as fetchGenresTvShows } from "../store/tv-shows-slice";
 import { fetchGenre as fetchGenresMovies } from "../store/movies-slice";
-
 import { othersActions } from "../store/other-slice";
 
 const GenrePage: React.FC = () => {
   const route = useLocation().pathname;
   const navigate = useNavigate();
 
-  const [movieOrTvShow, setMovieOrTvShow] = useState<"movie" | "tvShow">(
-    route.startsWith("/movie") ? "movie" : "tvShow"
+  const [mediaType, setMediaType] = useState<"MOVIE" | "TVSHOW">(
+    route.startsWith("/movie") ? "MOVIE" : "TVSHOW"
   );
 
   const genrePageMovies = useSelector(
@@ -40,53 +39,79 @@ const GenrePage: React.FC = () => {
   }, [genrePageTvShows.length, genrePageMovies.length]);
 
   return (
-    <>
-      <Box className="py-0 sm:py-0 px-0 sm:px-6 lg:px-36">
-        <Box className="py-6">
-          <Chip
-            variant={movieOrTvShow == "movie" ? "filled" : "outlined"}
-            clickable
-            label="Movies"
-            onClick={() => {
-              navigate("/movie/genre");
-              setMovieOrTvShow("movie");
-            }}
-          ></Chip>
-          <Chip
-            variant={movieOrTvShow == "movie" ? "outlined" : "filled"}
-            clickable
-            label="Tv Shows"
-            onClick={() => {
-              navigate("/tv-show/genre");
-              setMovieOrTvShow("tvShow");
-            }}
-          ></Chip>
-        </Box>
-
-        <Grid container spacing={{ xs: 0, sm: 3 }}>
-          {movieOrTvShow == "movie" &&
-            genrePageMovies.map((genreIem) => (
-              <Grid item key={genreIem.genre.id} lg={3} md={4} sm={6} xs={12}>
-                <GenreItem {...genreIem} movieOrTvShow={movieOrTvShow} />
-              </Grid>
-            ))}
-          {movieOrTvShow == "tvShow" &&
-            genrePageTvShows.map((genreIem) => (
-              <Grid item key={genreIem.genre.id} lg={3} md={4} sm={6} xs={12}>
-                <GenreItem {...genreIem} movieOrTvShow={movieOrTvShow} />
-              </Grid>
-            ))}
-          {(genrePageMovies.length == 0 || genrePageTvShows.length == 0) &&
-            [...Array(16)].map((index) => (
-              <Grid item key={index} lg={3} md={4} sm={6} xs={12}>
-                <Skeleton sx={{ transform: "none" }}>
-                  <img className="w-full" src="/placeholder.jpg" alt="" />
-                </Skeleton>
-              </Grid>
-            ))}
-        </Grid>
+    <Box className="py-0 sm:py-0 px-0 sm:px-6 lg:px-36 overflow-hidden">
+      {/* Chips */}
+      <Box className="mt-6 flex gap-2">
+        <Chip
+          variant={mediaType == "MOVIE" ? "filled" : "outlined"}
+          clickable
+          label="Movies"
+          onClick={() => {
+            navigate("/movie/genre");
+            setMediaType("MOVIE");
+          }}
+        ></Chip>
+        <Chip
+          variant={mediaType == "MOVIE" ? "outlined" : "filled"}
+          clickable
+          label="Tv Shows"
+          onClick={() => {
+            navigate("/tv-show/genre");
+            setMediaType("TVSHOW");
+          }}
+        ></Chip>
       </Box>
-    </>
+
+      {/* Movies */}
+      <Grid
+        className="transition-transform mt-0"
+        container
+        spacing={{ xs: 0, sm: 3 }}
+        sx={{
+          transform: `translateX(${mediaType == "MOVIE" ? "0vw" : "-100vw"})`,
+        }}
+      >
+        {mediaType == "MOVIE" &&
+          genrePageMovies.map((genreIem) => (
+            <Grid item key={genreIem.genre.id} lg={3} md={4} sm={6} xs={12}>
+              <GenreItem {...genreIem} mediaType={mediaType} />
+            </Grid>
+          ))}
+      </Grid>
+
+      {/* Tv Shows */}
+      <Grid
+        className="transition-transform mt-0"
+        container
+        spacing={{ xs: 0, sm: 3 }}
+        sx={{
+          transform: `translateX(${mediaType == "MOVIE" ? "100vw" : "0vw"})`,
+        }}
+      >
+        {mediaType == "TVSHOW" &&
+          genrePageTvShows.map((genreIem) => (
+            <Grid item key={genreIem.genre.id} lg={3} md={4} sm={6} xs={12}>
+              <GenreItem {...genreIem} mediaType={mediaType} />
+            </Grid>
+          ))}
+      </Grid>
+
+      {/* Skeletons */}
+      <Grid className="mt-0" container spacing={{ xs: 0, sm: 3 }}>
+        {(genrePageMovies.length == 0 || genrePageTvShows.length == 0) &&
+          Array.from({ length: 16 }, (_, i) => i).map((index) => (
+            <Grid item key={index} lg={3} md={4} sm={6} xs={12}>
+              <Skeleton sx={{ transform: "none" }}>
+                <img
+                  className="w-full"
+                  src="/placeholder.jpg"
+                  alt="dummy image"
+                />
+              </Skeleton>
+            </Grid>
+          ))}
+      </Grid>
+    </Box>
   );
 };
 

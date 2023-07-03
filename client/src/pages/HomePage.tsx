@@ -5,12 +5,12 @@ import { Box } from "@mui/material";
 
 import Hero from "../components/Hero";
 import ScrollableRow from "../components/ScrollableRow";
+import ScrollableRowTile from "../components/ScrollableRowTile";
 
 import store, { RootState } from "../store";
 
 import { fetchPopular as fetchPopularMovies } from "../store/movies-slice";
 import { fetchPopular as fetchPopularTvShows } from "../store/tv-shows-slice";
-import ScrollableRowTile from "../components/ScrollableRowTile";
 
 const HomePage: React.FC = () => {
   useEffect(() => {
@@ -67,79 +67,6 @@ const HomePage: React.FC = () => {
             width={"12rem"}
           />
         )}
-        <ScrollableRow
-          title="nice"
-          height={"18rem"}
-          width={"32rem"}
-          components={[
-            <Box className="w-full">
-              <iframe
-                className="border-none"
-                width="560"
-                height="315"
-                src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
-                title="YouTube video player"
-                allow="encrypted-media; fullscreen;"
-              ></iframe>
-            </Box>,
-            <iframe
-              className="border-none"
-              width="560"
-              height="315"
-              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
-              title="YouTube video player"
-              allow="encrypted-media; fullscreen;"
-            ></iframe>,
-            <iframe
-              className="border-none"
-              width="560"
-              height="315"
-              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
-              title="YouTube video player"
-              allow="encrypted-media; fullscreen;"
-            ></iframe>,
-            <iframe
-              className="border-none"
-              width="560"
-              height="315"
-              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
-              title="YouTube video player"
-              allow="encrypted-media; fullscreen;"
-            ></iframe>,
-            <iframe
-              className="border-none"
-              width="560"
-              height="315"
-              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
-              title="YouTube video player"
-              allow="encrypted-media; fullscreen;"
-            ></iframe>,
-            <iframe
-              className="border-none"
-              width="560"
-              height="315"
-              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
-              title="YouTube video player"
-              allow="encrypted-media; fullscreen;"
-            ></iframe>,
-            <iframe
-              className="border-none"
-              width="560"
-              height="315"
-              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
-              title="YouTube video player"
-              allow="encrypted-media; fullscreen;"
-            ></iframe>,
-            <iframe
-              className="border-none"
-              width="560"
-              height="315"
-              src={`https://www.youtube-nocookie.com/embed/yjRHZEUamCc`}
-              title="YouTube video player"
-              allow="encrypted-media; fullscreen;"
-            ></iframe>,
-          ]}
-        ></ScrollableRow>
       </Box>
     </>
   );
