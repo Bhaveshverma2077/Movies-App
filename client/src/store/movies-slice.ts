@@ -5,7 +5,7 @@ import { SERVER_URL } from "../settings";
 import {
   detailedMoviesType,
   movieGenreType,
-  genresList,
+  moviesGenreList,
   movieStateType,
   moviesType,
   genreType,
@@ -20,6 +20,7 @@ type moviesInitialSateType = {
   inTheatres: movieStateType;
   detailMovies: Array<detailedMoviesType>;
   genrePageMovies: Array<{ genre: genreType; backdrop: string }>;
+  movieGridLoading: "NOTLOADING" | "LOADING" | "ERROR";
   detailMovieStatus: "NOTLOADING" | "LOADING" | "ERROR";
   latest: movieStateType;
   upcomming: movieStateType;
@@ -28,6 +29,7 @@ type moviesInitialSateType = {
 
 const moviesInitialSate: moviesInitialSateType = {
   detailMovieStatus: "NOTLOADING",
+  movieGridLoading: "NOTLOADING",
   latest: { page: 0, movies: [] },
   popular: { page: 0, movies: [] },
   inTheatres: { page: 0, movies: [] },
@@ -112,7 +114,7 @@ const fetchGenreItems = createAsyncThunk<
 >("movies/update-genre-items", async (genreName, thunkApi) => {
   const state = thunkApi.getState();
 
-  const genre = genresList.find(
+  const genre = moviesGenreList.find(
     (genre) => genre.name.toLowerCase() == genreName
   );
 
@@ -126,9 +128,7 @@ const fetchGenreItems = createAsyncThunk<
     .then((res) => {
       return res.json();
     })
-    .then((body: Array<moviesType>) => {
-      return { genre: genre!, data: body };
-    });
+    .then((body: Array<moviesType>) => ({ genre: genre!, data: body }));
 });
 
 const fetchGenre = createAsyncThunk<
@@ -182,14 +182,17 @@ const moviesSlice = createSlice({
     });
     builder.addCase(fetchMovieDetail.fulfilled, (state, action) => {
       state.detailMovieStatus = "NOTLOADING";
-      console.log(action.payload);
-
       state.detailMovies.push(action.payload);
       return state;
     });
     //.....................
 
+    builder.addCase(fetchGenreItems.pending, (state, action) => {
+      state.movieGridLoading = "LOADING";
+      return state;
+    });
     builder.addCase(fetchGenreItems.fulfilled, (state, action) => {
+      state.movieGridLoading = "NOTLOADING";
       const genre = state.genres.find(
         (val) =>
           val.genreName.toLowerCase() == action.payload.genre.name.toLowerCase()
