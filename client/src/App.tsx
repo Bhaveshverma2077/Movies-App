@@ -1,10 +1,5 @@
 import { Provider } from "react-redux";
-
-import {
-  RouterProvider,
-  createBrowserRouter,
-  useParams,
-} from "react-router-dom";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 
 import {
   ThemeProvider,

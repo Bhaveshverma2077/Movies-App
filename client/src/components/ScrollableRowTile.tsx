@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 
-import { Box, Button, IconButton, Typography } from "@mui/material";
+import { Box, Button, Link, Typography } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 
-import { moviesType } from "../store/movies-slice";
-import { tvShowsType } from "../store/tv-shows-slice";
+import { moviesType, tvShowsType } from "../app-data";
 import ScrollableRowSkeleton from "./ScrollableRowSkeleton";
 import { useNavigate } from "react-router-dom";
 
@@ -56,14 +56,6 @@ const ScrollableRowTile: React.FC<Props> = (props) => {
 
   return (
     <Button
-      disabled={isLoading}
-      onClick={() => {
-        if (props.movie) {
-          navigate(`/movie/${movieOrTvData.id}`);
-          return;
-        }
-        navigate(`/tv-show/${movieOrTvData.id}`);
-      }}
       onMouseOver={() => {
         setIsHover(true);
       }}
@@ -107,10 +99,12 @@ const ScrollableRowTile: React.FC<Props> = (props) => {
           isHover ? "visible opacity-70" : "invisible opacity-0"
         } absolute w-full h-full p-3 flex flex-col justify-between transition-opacity`}
       ></Box>
-      <Box
+      <Link
+        component={RouterLink}
+        to={`/${props.movie ? "movie" : "tv-show"}/${movieOrTvData.id}`}
         className={`${
           isHover ? "visible opacity-100" : "invisible opacity-0"
-        } absolute w-full h-full p-3 flex flex-col justify-between `}
+        } absolute w-full h-full p-3 flex flex-col justify-between no-underline`}
       >
         <Typography
           variant="subtitle1"
@@ -144,7 +138,7 @@ const ScrollableRowTile: React.FC<Props> = (props) => {
               `Since ${props.tvShow?.firstAirDate.substring(0, 4)}`}
           </Typography>
         </Box>
-      </Box>
+      </Link>
     </Button>
   );
 };

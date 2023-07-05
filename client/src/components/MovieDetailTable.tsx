@@ -9,7 +9,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { detailedMoviesType } from "../store/movies-slice";
+import { detailedMoviesType } from "../app-data";
 
 const MovieDetailTable: React.FC<{ movie: detailedMoviesType | undefined }> = ({
   movie,

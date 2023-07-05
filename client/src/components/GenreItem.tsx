@@ -4,7 +4,7 @@ import LoadingGenreImage from "./LoadingGenreImage";
 
 import { Button, Typography } from "@mui/material";
 
-import { genreType } from "../store/movies-slice";
+import { genreType } from "../app-data";
 
 const GenreItem: React.FC<{
   genre: genreType;
