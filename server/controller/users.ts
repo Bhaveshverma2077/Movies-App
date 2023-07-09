@@ -1,15 +1,63 @@
 import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
 import User, { Favorite } from "../model/user";
 
-const addUser = (req: Request, res: Response, next: NextFunction) => {
-  const user = new User({ name: "nice" });
+const addUser = (
+  req: Request<{}, {}, { userName: string; email: string; password: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  const user = new User(req.body);
 
   user
     .save()
-    .then((_) => {
-      res.status(200).json({
-        message: "account added successfully",
+    .then((doc) => {
+      const resBody = {
+        userId: doc.id,
+        userName: req.body.userName,
+        email: req.body.email,
+        token: jwt.sign({ userId: doc.id }, process.env.SECRET_KEY!),
+      };
+
+      res.status(200).json(resBody);
+    })
+    .catch(() => {
+      res.status(400).json({
+        message: "failed to create an account",
       });
+    });
+};
+
+const getUser = (req: Request, res: Response, next: NextFunction) => {
+  User.findById(req.userId)
+    .then((doc) => {
+      const resBody = {
+        userId: doc?.id,
+        userName: doc?.userName,
+        email: doc?.email,
+        favorite: doc?.favoritesMedia,
+      };
+
+      res.status(200).json(resBody);
+    })
+    .catch(() => {
+      res.status(400).json({
+        message: "failed to create an account",
+      });
+    });
+};
+
+const loginUser = (req: Request, res: Response, next: NextFunction) => {
+  User.findById(req.userId)
+    .then((doc) => {
+      const resBody = {
+        userId: doc?.id,
+        userName: req.body.userName,
+        email: req.body.email,
+        token: jwt.sign({ userId: doc?.id }, process.env.SECRET_KEY!),
+      };
+
+      res.status(200).json(resBody);
     })
     .catch(() => {
       res.status(400).json({
@@ -19,10 +67,12 @@ const addUser = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const addFavorite = (req: Request, res: Response, next: NextFunction) => {
-  const favorite = new Favorite({ mediaId: 23, mediaType: "MOVIE" });
-
+  const favorite = new Favorite({
+    mediaId: req.body.mediaId,
+    mediaType: req.body.mediaType,
+  });
   User.findOneAndUpdate(
-    { _id: "64a59740e0c4a9582a146a22" },
+    { _id: req.userId },
     {
       $push: { favoritesMedia: favorite },
     }
@@ -40,12 +90,20 @@ const addFavorite = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const removeFavorite = (req: Request, res: Response, next: NextFunction) => {
-  const favorite = new Favorite({ mediaId: 23, mediaType: "MOVIE" });
+  const favorite = {
+    mediaId: req.body.mediaId,
+    mediaType: req.body.mediaType,
+  };
 
   User.findOneAndUpdate(
-    { _id: "64a59740e0c4a9582a146a22" },
+    { _id: req.userId },
     {
-      $pull: { favoritesMedia: { mediaId: 23, mediaType: "MOVIE" } },
+      $pull: {
+        favoritesMedia: {
+          mediaId: req.body.mediaId,
+          mediaType: req.body.mediaType,
+        },
+      },
     }
   )
     .then((_) => {
@@ -60,8 +118,4 @@ const removeFavorite = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-export default {
-  addUser,
-  addFavorite,
-  removeFavorite,
-};
+export default { getUser, addUser, loginUser, addFavorite, removeFavorite };

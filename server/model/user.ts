@@ -6,7 +6,9 @@ interface FavoritesMedia {
 }
 
 interface UserInterface {
-  name: string;
+  userName: string;
+  email: string;
+  password: string;
   favoritesMedia: Array<FavoritesMedia>;
 }
 
@@ -16,7 +18,9 @@ const favoritesMediaSchema = new Schema<FavoritesMedia>({
 });
 
 const userSchema = new Schema<UserInterface>({
-  name: { type: String, required: true },
+  userName: { type: String, required: true },
+  email: { type: String, required: true },
+  password: { type: String, required: true },
   favoritesMedia: { type: [favoritesMediaSchema], default: [] },
 });
 
