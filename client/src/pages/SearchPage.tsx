@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import {
@@ -126,6 +126,7 @@ const SearchPage: React.FC = () => {
           }
           renderInput={(params) => (
             <TextField
+              autoFocus
               {...params}
               InputProps={{
                 ...params.InputProps,
