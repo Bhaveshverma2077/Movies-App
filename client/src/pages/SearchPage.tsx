@@ -38,9 +38,12 @@ const SearchPage: React.FC = () => {
 
   useEffect(() => {
     let timer = setTimeout(() => {
-      navigate(
+      window.history.replaceState(
+        null,
+        "Search Page",
         `/${mediaType == "MOVIE" ? "movie" : "tv-show"}/search/${searchString}`
       );
+
       if (searchString == "") {
         return;
       }
