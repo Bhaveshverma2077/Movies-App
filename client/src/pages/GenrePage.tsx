@@ -47,7 +47,7 @@ const GenrePage: React.FC = () => {
           clickable
           label="Movies"
           onClick={() => {
-            navigate("/movie/genre");
+            window.history.replaceState(null, "Movies Genre", "/movie/genre");
             setMediaType("MOVIE");
           }}
         ></Chip>
@@ -56,12 +56,15 @@ const GenrePage: React.FC = () => {
           clickable
           label="Tv Shows"
           onClick={() => {
-            navigate("/tv-show/genre");
+            window.history.replaceState(
+              null,
+              "Tv Shows Genre",
+              "/tv-show/genre"
+            );
             setMediaType("TVSHOW");
           }}
         ></Chip>
       </Box>
-
       {/* Movies */}
       <Grid
         className="transition-transform mt-0"
@@ -81,7 +84,7 @@ const GenrePage: React.FC = () => {
 
       {/* Tv Shows */}
       <Grid
-        className="transition-transform mt-0"
+        className="transition-transform mt-0 "
         container
         spacing={{ xs: 0, sm: 3 }}
         sx={{
