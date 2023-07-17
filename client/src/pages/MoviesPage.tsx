@@ -39,10 +39,17 @@ const MoviesPage: React.FC = () => {
   );
 
   useEffect(() => {
-    store.dispatch(fetchPopular());
-    store.dispatch(fetchTopRated());
-    store.dispatch(fetchUpcoming());
-    store.dispatch(fetchInTheatres());
+    if (
+      popularMovies.page === 0 ||
+      topRatedMovies.page === 0 ||
+      upcomingMovies.page === 0 ||
+      inTheatresMovies.page === 0
+    ) {
+      store.dispatch(fetchPopular());
+      store.dispatch(fetchTopRated());
+      store.dispatch(fetchUpcoming());
+      store.dispatch(fetchInTheatres());
+    }
   }, []);
 
   useEffect(() => {
@@ -50,15 +57,6 @@ const MoviesPage: React.FC = () => {
       store.dispatch(fetchMovieDetail(popularMovies.movies[0].id));
     }
   }, [popularMovies.movies[0]]);
-
-  if (
-    popularMovies.page == 0 ||
-    topRatedMovies.page == 0 ||
-    upcomingMovies.page == 0 ||
-    inTheatresMovies.page == 0 ||
-    !moviesDetail
-  )
-    return <></>;
 
   return (
     <Box className="flex flex-col gap-36 md:gap-12">
@@ -69,7 +67,9 @@ const MoviesPage: React.FC = () => {
         logoImg={
           "https://image.tmdb.org/t/p/original/24dIhRKjLnYRanA2Mo0ycZfObUp.png"
         }
-        description={moviesDetail.overview}
+        description={
+          "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces, and one strange little girl."
+        }
       />
       <Box className="flex flex-col gap-8">
         {popularMovies &&

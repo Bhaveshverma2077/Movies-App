@@ -38,11 +38,19 @@ const TvShowsPage: React.FC = () => {
   );
 
   useEffect(() => {
-    store.dispatch(fetchPopular());
-    store.dispatch(fetchTopRated());
-    store.dispatch(fetchOnTheAir());
-    store.dispatch(fetchAiringToday());
-    store.dispatch(fetchOnNetflix());
+    if (
+      popularTvShows.page === 0 ||
+      topRatedTvShows.page === 0 ||
+      onTheAirTvShows.page === 0 ||
+      AiringTodayTvShows.page === 0 ||
+      onNetflixTvShows.page === 0
+    ) {
+      store.dispatch(fetchPopular());
+      store.dispatch(fetchTopRated());
+      store.dispatch(fetchOnTheAir());
+      store.dispatch(fetchAiringToday());
+      store.dispatch(fetchOnNetflix());
+    }
   }, []);
 
   useEffect(() => {
@@ -52,15 +60,6 @@ const TvShowsPage: React.FC = () => {
       );
     }
   }, [popularTvShows.tvShows[tvShowHeroIndex]]);
-
-  if (
-    !popularTvShows ||
-    !topRatedTvShows ||
-    !onTheAirTvShows ||
-    !AiringTodayTvShows ||
-    !tvshowsDetail
-  )
-    return <></>;
 
   return (
     <Box className="flex flex-col gap-36 md:gap-12">
