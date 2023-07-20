@@ -48,12 +48,12 @@ const getUser = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const loginUser = (req: Request, res: Response, next: NextFunction) => {
-  User.findById(req.userId)
+  User.findOne({ email: req.body.email, password: req.body.password })
     .then((doc) => {
       const resBody = {
         userId: doc?.id,
-        userName: req.body.userName,
-        email: req.body.email,
+        userName: doc?.userName,
+        email: doc?.email,
         token: jwt.sign({ userId: doc?.id }, process.env.SECRET_KEY!),
       };
 
