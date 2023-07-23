@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 import GenreItem from "../components/GenreItem";
 
@@ -13,7 +13,6 @@ import { othersActions } from "../store/other-slice";
 
 const GenrePage: React.FC = () => {
   const route = useLocation().pathname;
-  const navigate = useNavigate();
 
   const [mediaType, setMediaType] = useState<"MOVIE" | "TVSHOW">(
     route.startsWith("/movie") ? "MOVIE" : "TVSHOW"
@@ -104,13 +103,10 @@ const GenrePage: React.FC = () => {
         {(genrePageMovies.length == 0 || genrePageTvShows.length == 0) &&
           Array.from({ length: 16 }, (_, i) => i).map((index) => (
             <Grid item key={index} lg={3} md={4} sm={6} xs={12}>
-              <Skeleton sx={{ transform: "none" }}>
-                <img
-                  className="w-full"
-                  src="/placeholder.jpg"
-                  alt="dummy image"
-                />
-              </Skeleton>
+              <Skeleton
+                className="w-full aspect-video"
+                sx={{ transform: "none" }}
+              ></Skeleton>
             </Grid>
           ))}
       </Grid>
