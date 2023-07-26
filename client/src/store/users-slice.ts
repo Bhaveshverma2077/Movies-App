@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { RootState } from ".";
 import { SERVER_URL } from "../settings";
+import { type } from "os";
 
 const apiUrl = SERVER_URL;
 
@@ -124,37 +125,31 @@ export const setUser = createAsyncThunk<
     );
 });
 
-export const addMediaToFavorites = createAsyncThunk<
-  favorite,
-  { mediaType: "MOVIE" | "TVSHOW"; mediaId: number },
-  { state: RootState }
->("users/add-favorite", async ({ mediaType, mediaId }) => {
-  const token = localStorage.getItem("token");
-  return fetch(`http://${apiUrl}/users/add-favorite`, {
-    method: "POST",
-    body: JSON.stringify({ mediaType, mediaId }),
-    headers: header(token),
-  })
-    .then((res) => res.json())
-    .then((body) => {
-      return { mediaType, mediaId };
-    });
-});
+type setFav = {
+  mediaType: "MOVIE" | "TVSHOW";
+  mediaId: number;
+  operation: "ADD" | "REMOVE";
+};
 
-export const removeMediaFromFavorites = createAsyncThunk<
-  favorite,
-  { mediaType: "MOVIE" | "TVSHOW"; mediaId: number },
+export const setFavorite = createAsyncThunk<
+  setFav,
+  setFav,
   { state: RootState }
->("users/remove-favorite", async ({ mediaType, mediaId }) => {
+>("users/set-favorite", async ({ mediaType, mediaId, operation }) => {
   const token = localStorage.getItem("token");
-  return fetch(`http://${apiUrl}/users/remove-favorite`, {
-    method: "POST",
-    body: JSON.stringify({ mediaType, mediaId }),
-    headers: header(token),
-  })
+  return fetch(
+    `http://${apiUrl}/users/set-favorite/${
+      operation === "ADD" ? "add" : "remove"
+    }`,
+    {
+      method: "POST",
+      body: JSON.stringify({ mediaType, mediaId }),
+      headers: header(token),
+    }
+  )
     .then((res) => res.json())
     .then((body) => {
-      return { mediaType, mediaId };
+      return { mediaType, mediaId, operation };
     });
 });
 
@@ -192,18 +187,21 @@ const userSlice = createSlice({
       state.favorites = action.payload.favorite;
       return state;
     });
-    builder.addCase(addMediaToFavorites.fulfilled, (state, action) => {
-      state.favorites.push(action.payload);
-      return state;
-    });
-    builder.addCase(removeMediaFromFavorites.fulfilled, (state, action) => {
-      state.favorites = state.favorites.filter(
-        (favorite) =>
-          !(
-            favorite.mediaId === action.payload.mediaId &&
-            favorite.mediaType === action.payload.mediaType
-          )
-      );
+    builder.addCase(setFavorite.fulfilled, (state, action) => {
+      if (action.payload.operation == "ADD") {
+        state.favorites.push({
+          mediaId: action.payload.mediaId,
+          mediaType: action.payload.mediaType,
+        });
+      } else {
+        state.favorites = state.favorites.filter(
+          (favorite) =>
+            !(
+              favorite.mediaId === action.payload.mediaId &&
+              favorite.mediaType === action.payload.mediaType
+            )
+        );
+      }
       return state;
     });
   },
