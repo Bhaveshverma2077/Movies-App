@@ -56,7 +56,6 @@ const loginUser = (req: Request, res: Response, next: NextFunction) => {
         email: doc?.email,
         token: jwt.sign({ userId: doc?.id }, process.env.SECRET_KEY!),
       };
-
       res.status(200).json(resBody);
     })
     .catch(() => {
@@ -66,56 +65,48 @@ const loginUser = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
-const addFavorite = (req: Request, res: Response, next: NextFunction) => {
+const setFavorite = (req: Request, res: Response, next: NextFunction) => {
+  const operation = req.url.split("/")[2];
+
+  if (!(operation === "add" || operation === "remove")) {
+    res.status(404).json({
+      message: "operation not available",
+    });
+    return;
+  }
+
   const favorite = new Favorite({
     mediaId: req.body.mediaId,
     mediaType: req.body.mediaType,
   });
+
   User.findOneAndUpdate(
     { _id: req.userId },
-    {
-      $push: { favoritesMedia: favorite },
-    }
+    operation === "add"
+      ? {
+          $push: { favoritesMedia: favorite },
+        }
+      : {
+          $pull: {
+            favoritesMedia: {
+              mediaId: req.body.mediaId,
+              mediaType: req.body.mediaType,
+            },
+          },
+        }
   )
     .then((_) => {
+      console.log(operation);
       res.status(200).json({
-        message: "add favorite successfully",
+        message: "operation successfull",
       });
     })
     .catch(() => {
+      console.log("un");
       res.status(400).json({
-        message: "failed to add favorite",
+        message: "operation successfull failed",
       });
     });
 };
 
-const removeFavorite = (req: Request, res: Response, next: NextFunction) => {
-  const favorite = {
-    mediaId: req.body.mediaId,
-    mediaType: req.body.mediaType,
-  };
-
-  User.findOneAndUpdate(
-    { _id: req.userId },
-    {
-      $pull: {
-        favoritesMedia: {
-          mediaId: req.body.mediaId,
-          mediaType: req.body.mediaType,
-        },
-      },
-    }
-  )
-    .then((_) => {
-      res.status(200).json({
-        message: "favorite removed successfully",
-      });
-    })
-    .catch(() => {
-      res.status(400).json({
-        message: "failed to remove favorite",
-      });
-    });
-};
-
-export default { getUser, addUser, loginUser, addFavorite, removeFavorite };
+export default { getUser, addUser, loginUser, setFavorite };
