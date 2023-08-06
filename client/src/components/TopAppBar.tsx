@@ -149,7 +149,9 @@ const TopAppBar = () => {
                   component={LinkReactRouter}
                   key={page.title}
                   className={`text-white block cursor-pointer transition-transform ${
-                    activeNavLinkIndex === i ? "text-[#e03131]" : ""
+                    activeNavLinkIndex === i
+                      ? "text-[#e03131] visited:text-[#e03131]"
+                      : ""
                   }`}
                   underline="none"
                   to={page.path}
