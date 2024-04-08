@@ -384,6 +384,8 @@ const getGenre = (req: Request, res: Response, next: NextFunction) => {
         {
           headers: {
             Authorization: `Bearer ${process.env.API_KEY}`,
+            sort_by: "popularity.desc",
+            language: "en-US",
           },
         }
       )
