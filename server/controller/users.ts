@@ -96,15 +96,13 @@ const setFavorite = (req: Request, res: Response, next: NextFunction) => {
         }
   )
     .then((_) => {
-      console.log(operation);
       res.status(200).json({
-        message: "operation successfull",
+        message: "operation successful",
       });
     })
     .catch(() => {
-      console.log("un");
       res.status(400).json({
-        message: "operation successfull failed",
+        message: "operation failed",
       });
     });
 };
