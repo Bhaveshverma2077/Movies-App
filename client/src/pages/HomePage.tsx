@@ -14,8 +14,10 @@ import { fetchPopular as fetchPopularTvShows } from "../store/tv-shows-slice";
 
 const HomePage: React.FC = () => {
   useEffect(() => {
-    store.dispatch(fetchPopularMovies());
-    store.dispatch(fetchPopularTvShows());
+    if (popularMoviesState.page === 0 || popularTvShowsState.page === 0) {
+      store.dispatch(fetchPopularMovies());
+      store.dispatch(fetchPopularTvShows());
+    }
   }, []);
 
   const popularMoviesState = useSelector(
@@ -42,13 +44,13 @@ const HomePage: React.FC = () => {
               <ScrollableRowTile
                 posterOrBackdrop={"POSTER"}
                 key={data.id}
-                height={"18rem"}
-                width={"12rem"}
+                height={"15rem"}
+                width={"10rem"}
                 movie={data}
               ></ScrollableRowTile>
             ))}
-            height={"18rem"}
-            width={"12rem"}
+            height={"15rem"}
+            width={"10rem"}
           />
         )}
         {popularTvShowsState && popularTvShowsState.tvShows.length != 0 && (
@@ -58,13 +60,13 @@ const HomePage: React.FC = () => {
               <ScrollableRowTile
                 posterOrBackdrop={"POSTER"}
                 key={data.id}
-                height={"18rem"}
-                width={"12rem"}
+                height={"15rem"}
+                width={"10rem"}
                 tvShow={data}
               ></ScrollableRowTile>
             ))}
-            height={"18rem"}
-            width={"12rem"}
+            height={"15rem"}
+            width={"10rem"}
           />
         )}
       </Box>
