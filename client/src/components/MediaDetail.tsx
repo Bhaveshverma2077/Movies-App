@@ -10,6 +10,9 @@ import LoadingImagePoster from "../components/LoadingImagePoster";
 
 import { detailedMoviesType, moviesType } from "../app-data";
 import { detailedtvShowsType, tvShowsType } from "../app-data";
+import store, { RootState } from "../store";
+import { setFavorite } from "../store/users-slice";
+import { useSelector } from "react-redux";
 
 type Props = {
   status: "NOTLOADING" | "LOADING" | "ERROR";
@@ -17,8 +20,37 @@ type Props = {
   mediaType: "MOVIE" | "TVSHOW";
 };
 
+const favoriteButtonHandler = (
+  navigate: ReturnType<typeof useNavigate>,
+  isFav?: boolean,
+  mediaType?: "MOVIE" | "TVSHOW",
+  mediaId?: number
+) => {
+  if (!localStorage.getItem("token")) {
+    navigate("/login");
+  }
+  store.dispatch(
+    setFavorite({
+      mediaId: mediaId!,
+      mediaType: mediaType!,
+      operation: isFav ? "REMOVE" : "ADD",
+    })
+  );
+};
+
 const MediaDetail: React.FC<Props> = ({ status, media, mediaType }) => {
+  const state = useSelector((state: RootState) => state);
+
   const navigate = useNavigate();
+
+  const favorites = useSelector((state: RootState) => state.users.favorites);
+
+  const isFavorite = !!favorites?.find((fav) => {
+    if (media?.id && fav.mediaId) {
+      return media?.id == fav.mediaId;
+    }
+    return false;
+  });
 
   return (
     <Grid container>
@@ -80,6 +112,19 @@ const MediaDetail: React.FC<Props> = ({ status, media, mediaType }) => {
                   </Button>
                 ))}
               </Box>
+              <Button
+                variant="contained"
+                onClick={() =>
+                  favoriteButtonHandler(
+                    navigate,
+                    isFavorite,
+                    mediaType,
+                    media?.id
+                  )
+                }
+              >
+                {isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+              </Button>
               <Box className="pt-12"></Box>
               {media?.watchProvider.length === 0 ? (
                 <Typography variant="body1">
@@ -152,8 +197,8 @@ const MediaDetail: React.FC<Props> = ({ status, media, mediaType }) => {
                   <ScrollableRowTile
                     posterOrBackdrop={"POSTER"}
                     key={data.id}
-                    height={"18rem"}
-                    width={"12rem"}
+                    height={"15rem"}
+                    width={"10rem"}
                     movie={
                       mediaType == "MOVIE" ? (data as moviesType) : undefined
                     }
@@ -162,8 +207,8 @@ const MediaDetail: React.FC<Props> = ({ status, media, mediaType }) => {
                     }
                   ></ScrollableRowTile>
                 ))}
-                height={"18rem"}
-                width={"12rem"}
+                height={"15rem"}
+                width={"10rem"}
               />
             )}
           {media && media.similar && media.similar.length != 0 && (
@@ -173,8 +218,8 @@ const MediaDetail: React.FC<Props> = ({ status, media, mediaType }) => {
                 <ScrollableRowTile
                   posterOrBackdrop={"POSTER"}
                   key={data.id}
-                  height={"18rem"}
-                  width={"12rem"}
+                  height={"15rem"}
+                  width={"10rem"}
                   movie={
                     mediaType == "MOVIE" ? (data as moviesType) : undefined
                   }
@@ -183,8 +228,8 @@ const MediaDetail: React.FC<Props> = ({ status, media, mediaType }) => {
                   }
                 ></ScrollableRowTile>
               ))}
-              height={"18rem"}
-              width={"12rem"}
+              height={"15rem"}
+              width={"10rem"}
             />
           )}
         </Box>
