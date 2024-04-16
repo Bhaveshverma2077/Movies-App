@@ -27,7 +27,7 @@ const MediaTile: React.FC<{
     >
       <img
         className="w-full block"
-        src={`https://image.tmdb.org/t/p/w500${props.posterPath}`}
+        src={`https://image.tmdb.org/t/p/w300${props.posterPath}`}
         alt=""
       />
     </Link>
