@@ -24,10 +24,16 @@ import TvShowsPage from "./pages/TvShowsPage";
 import PaddingTopWrapper from "./components/PaddingTopWrapper";
 
 import store from "./store";
+import { useEffect } from "react";
+import { loginUser, setUser } from "./store/users-slice";
 
 function App() {
+  useEffect(() => {
+    store.dispatch(setUser());
+  }, []);
+
   const theme = createTheme({
-    palette: { mode: "dark", primary: { main: "#E50914" } },
+    palette: { mode: "dark", primary: { main: "#e03131" } },
     typography: {
       fontFamily: "Lato, sans-serif",
       fontWeightBold: 700,
@@ -85,7 +91,11 @@ function App() {
             },
             {
               path: ":id",
-              element: <MovieDetailPage />,
+              element: (
+                <PaddingTopWrapper pt={6}>
+                  <MovieDetailPage />
+                </PaddingTopWrapper>
+              ),
             },
             {
               path: "search",
@@ -147,11 +157,32 @@ function App() {
                 },
               ],
             },
-            { path: ":id", element: <TvShowDetailPage /> },
+            {
+              path: ":id",
+              element: (
+                <PaddingTopWrapper pt={6}>
+                  <TvShowDetailPage />
+                </PaddingTopWrapper>
+              ),
+            },
           ],
         },
-        { path: "/login", element: <AuthPage /> },
-        { path: "/signup", element: <AuthPage /> },
+        {
+          path: "/login",
+          element: (
+            <PaddingTopWrapper pt={6}>
+              <AuthPage />
+            </PaddingTopWrapper>
+          ),
+        },
+        {
+          path: "/signup",
+          element: (
+            <PaddingTopWrapper pt={6}>
+              <AuthPage />
+            </PaddingTopWrapper>
+          ),
+        },
       ],
     },
   ]);
