@@ -44,7 +44,7 @@ const SearchPage: React.FC = () => {
         `/${mediaType == "MOVIE" ? "movie" : "tv-show"}/search/${searchString}`
       );
 
-      if (searchString == "") {
+      if (searchString.trim() == "") {
         return;
       }
       setIsLoading(true);
