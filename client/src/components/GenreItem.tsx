@@ -20,7 +20,7 @@ const GenreItem: React.FC<{
           return navigate(`/movie/genre/${props.genre.name.toLowerCase()}`);
         return navigate(`/tv-show/genre/${props.genre.name.toLowerCase()}`);
       }}
-      className={`transition-transform text-zinc-200 p-0 relative w-full`}
+      className={`transition-transform text-zinc-200 p-0 relative w-full aspect-video`}
       sx={{
         "& div": { opacity: 0.4 },
         "&:hover": {
