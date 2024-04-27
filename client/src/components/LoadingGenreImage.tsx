@@ -7,21 +7,18 @@ const LoadingGenreImage: React.FC<{ backdrop: string }> = (props) => {
   return (
     <>
       {isImageLoading && (
-        <Skeleton sx={{ transform: "none" }}>
-          {
-            <Box className="bg-zinc-800 transition-opacity">
-              <img className="w-full block" src={`/placeholder.jpg`} alt="" />
-            </Box>
-          }
-        </Skeleton>
+        <Skeleton
+          className="w-full aspect-video"
+          sx={{ transform: "none" }}
+        ></Skeleton>
       )}
       <Box
         className={`bg-zinc-800 transition-opacity ${
-          isImageLoading ? "hidden" : "block"
+          isImageLoading ? "hidden" : ""
         }`}
       >
         <img
-          className="w-full block"
+          className="w-full h-full block"
           src={`https://image.tmdb.org/t/p/w500${props.backdrop}`}
           alt=""
           onLoad={() => {
