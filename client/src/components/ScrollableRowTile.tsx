@@ -76,7 +76,7 @@ const ScrollableRowTile: React.FC<Props> = (props) => {
       {!error && (
         <img
           className={`scale-50 w-full ${isLoading && "hidden"}`}
-          src={`https://image.tmdb.org/t/p/w500${movieOrTvData.path}`}
+          src={`https://image.tmdb.org/t/p/w342${movieOrTvData.path}`}
           alt={movieOrTvData.name}
           onLoad={() => {
             setIsLoading(false);
