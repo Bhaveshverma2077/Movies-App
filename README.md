@@ -1,5 +1,7 @@
 # Movies-App
 
+[![deployed badge](https://img.shields.io/badge/Status-Deployed-brightgreen)](https://movies-app-client-psi.vercel.app/)
+
 **Movies App** is a web application built with React, Material-UI, and Redux Toolkit, designed to help users discover, explore, and enjoy their favorite movies and TV shows. This project harnesses the power of the TMDB (The Movie Database) API to provide an extensive and up-to-date collection of movie and TV show information.
 
 ## Preview
